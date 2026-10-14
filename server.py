@@ -12,7 +12,7 @@ import sys
 import datetime
 import urllib.parse
 
-PORT = 8080
+PORT = int(os.environ.get('PORT', 8080))
 DB_FILE = os.path.join(os.path.dirname(__file__), 'data', 'leaderboard.db')
 
 def init_db():
