@@ -1,0 +1,1 @@
+A geoguesser inspired game where the locations are entirely at NTNU
