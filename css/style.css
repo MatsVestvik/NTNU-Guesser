@@ -471,6 +471,25 @@ html, body {
   box-shadow: var(--shadow-glow), var(--shadow-lg);
 }
 
+/* Result Expanded State for Map during round reveal */
+.map-widget-container.result-expanded {
+  position: absolute;
+  top: 90px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  width: auto !important;
+  height: auto !important;
+  z-index: 120;
+  border-color: var(--border-glow);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.85);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.map-widget-container.result-expanded .map-footer {
+  display: none;
+}
+
 /* Map Header Bar */
 .map-bar {
   height: 42px;
@@ -853,6 +872,32 @@ html, body {
 /* ==========================================================================
    ROUND RESULT MODAL
    ========================================================================== */
+
+#round-result-modal {
+  background: rgba(3, 7, 18, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 180;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 24px;
+}
+
+#round-result-modal .modal-card {
+  max-width: 620px;
+  background: rgba(13, 21, 39, 0.95);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 112, 243, 0.35);
+  animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 24px;
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(50px) scale(0.96); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
 
 .result-stat-banner {
   display: flex;

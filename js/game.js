@@ -113,10 +113,17 @@ class NTNUGuesserGame {
     // Next round
     if (this.elements.btnNextRound) {
       this.elements.btnNextRound.addEventListener('click', () => {
-        soundManager.playClick();
+        try {
+          soundManager.playClick();
+        } catch (e) {}
+
         this.elements.roundResultModal.classList.add('hidden');
-        if (this.currentRoundIndex < this.totalRounds) {
-          this.loadRound(this.currentRoundIndex);
+        this.elements.mapWidget.classList.remove('result-expanded');
+        this.elements.mapWidget.classList.remove('pinned-large');
+
+        const nextRoundIndex = this.currentRoundIndex + 1;
+        if (nextRoundIndex < this.totalRounds) {
+          this.loadRound(nextRoundIndex);
         } else {
           this.showGameOver();
         }
@@ -231,8 +238,17 @@ class NTNUGuesserGame {
       });
     }
 
-    // Keyboard shortcuts: Space to guess, Esc to unpin map
+    // Keyboard shortcuts: Space to guess, Enter/Space for next round, Esc to unpin map
     window.addEventListener('keydown', (e) => {
+      // If round result modal is open, advance on Enter or Space
+      if (this.elements.roundResultModal && !this.elements.roundResultModal.classList.contains('hidden')) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.elements.btnNextRound.click();
+          return;
+        }
+      }
+
       if (e.key === ' ' && !this.elements.btnGuess.disabled && this.gameActive) {
         e.preventDefault();
         this.submitGuess();
@@ -315,8 +331,9 @@ class NTNUGuesserGame {
     this.elements.btnGuess.classList.remove('ready');
     if (this.elements.hintBox) this.elements.hintBox.classList.add('hidden');
 
-    // Unpin map if enlarged
+    // Unpin & un-expand map
     this.elements.mapWidget.classList.remove('pinned-large');
+    this.elements.mapWidget.classList.remove('result-expanded');
     this.gameMap.clearRound();
 
     // Load photo
@@ -399,12 +416,16 @@ class NTNUGuesserGame {
     };
     this.roundsData.push(roundResult);
 
-    // Show on Map
-    this.gameMap.showRoundResult(
-      [guessCoords.lat, guessCoords.lng],
-      [targetCoords.lat, targetCoords.lng],
-      this.currentLocation.name
-    );
+    // Expand map so player sees their guess and the target
+    this.elements.mapWidget.classList.add('result-expanded');
+    setTimeout(() => {
+      this.gameMap.invalidate();
+      this.gameMap.showRoundResult(
+        [guessCoords.lat, guessCoords.lng],
+        [targetCoords.lat, targetCoords.lng],
+        this.currentLocation.name
+      );
+    }, 150);
 
     // Show result popup
     this.showRoundResultModal(roundResult);
@@ -429,7 +450,11 @@ class NTNUGuesserGame {
     };
     this.roundsData.push(roundResult);
 
-    this.gameMap.showRoundResult(null, [targetCoords.lat, targetCoords.lng], this.currentLocation.name);
+    this.elements.mapWidget.classList.add('result-expanded');
+    setTimeout(() => {
+      this.gameMap.invalidate();
+      this.gameMap.showRoundResult(null, [targetCoords.lat, targetCoords.lng], this.currentLocation.name);
+    }, 150);
     this.showRoundResultModal(roundResult, true);
   }
 
