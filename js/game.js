@@ -266,9 +266,6 @@ class NTNUGuesserGame {
       btnZoomOut: document.getElementById('btn-zoom-out'),
       btnResetView: document.getElementById('btn-reset-view'),
       btnFullscreen: document.getElementById('btn-fullscreen'),
-      btnHint: document.getElementById('btn-hint'),
-      hintBox: document.getElementById('hint-box'),
-      hintText: document.getElementById('hint-text'),
 
       // Map widget
       mapWidget: document.getElementById('map-widget'),
@@ -300,7 +297,6 @@ class NTNUGuesserGame {
       resultRating: document.getElementById('result-rating'),
       resultLocationName: document.getElementById('result-location-name'),
       resultCampusName: document.getElementById('result-campus-name'),
-      resultLore: document.getElementById('result-lore'),
       btnNextRound: document.getElementById('btn-next-round'),
 
       // Game Over: Bell Curve & Leaderboard
@@ -617,22 +613,6 @@ class NTNUGuesserGame {
       });
     }
 
-    // Hint toggle
-    if (this.elements.btnHint) {
-      this.elements.btnHint.addEventListener('click', () => {
-        soundManager.playClick();
-        if (this.elements.hintBox) {
-          const isHidden = this.elements.hintBox.classList.contains('hidden');
-          if (isHidden && this.currentLocation) {
-            this.elements.hintText.textContent = this.currentLocation.hint;
-            this.elements.hintBox.classList.remove('hidden');
-          } else {
-            this.elements.hintBox.classList.add('hidden');
-          }
-        }
-      });
-    }
-
     // Map size toggle
     if (this.elements.btnToggleMapSize) {
       this.elements.btnToggleMapSize.addEventListener('click', () => {
@@ -668,7 +648,6 @@ class NTNUGuesserGame {
           this.elements.mapWidget.classList.remove('pinned-large');
           this.gameMap.invalidate();
         }
-        if (this.elements.hintBox) this.elements.hintBox.classList.add('hidden');
         if (this.elements.leaderboardModal) this.elements.leaderboardModal.classList.add('hidden');
       }
     });
@@ -731,7 +710,6 @@ class NTNUGuesserGame {
     this.elements.roundDisplay.textContent = `${modeTag} • Runde ${index + 1} / ${this.totalRounds}`;
     this.elements.btnGuess.disabled = true;
     this.elements.btnGuess.classList.remove('ready');
-    if (this.elements.hintBox) this.elements.hintBox.classList.add('hidden');
 
     // Unpin & un-expand map
     this.elements.mapWidget.classList.remove('pinned-large');
@@ -852,10 +830,9 @@ class NTNUGuesserGame {
 
     soundManager.playRoundFinish(data.score);
 
-    // Location Lore
+    // Location Info
     this.elements.resultLocationName.textContent = data.target.name;
     this.elements.resultCampusName.textContent = `Campus ${data.target.campus}`;
-    this.elements.resultLore.textContent = data.target.lore;
 
     setTimeout(() => {
       this.elements.roundResultModal.classList.remove('hidden');

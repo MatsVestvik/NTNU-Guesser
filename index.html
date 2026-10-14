@@ -87,19 +87,6 @@
         <button class="hud-btn" id="btn-zoom-out" title="Zoom ut (-)">−</button>
         <button class="hud-btn" id="btn-reset-view" title="Tilbakestill visning (⟲)">⟲</button>
         <button class="hud-btn" id="btn-fullscreen" title="Fullskjerm">⛶</button>
-        <button class="hud-btn hint-btn" id="btn-hint" title="Hint">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M12 2a7 7 0 0 0-7 7c0 2.5 1.5 4.5 3 6h8c1.5-1.5 3-3.5 3-6a7 7 0 0 0-7-7z"></path></svg>
-        </button>
-      </div>
-
-      <!-- Hint Box -->
-      <div class="hint-popup hidden" id="hint-box">
-        <div class="hint-popup-title">
-          <span>Campus-hint</span>
-        </div>
-        <div class="hint-popup-text" id="hint-text">
-          Se deg godt rundt etter karakteristiske fasader og detaljer.
-        </div>
       </div>
     </main>
 
@@ -228,15 +215,10 @@
 
         <div class="result-badge high" id="result-rating">Meget bra treff</div>
 
-        <!-- Location Fact / Lore -->
-        <div class="lore-card">
-          <div class="lore-card-header">
-            <h3 class="lore-location-name" id="result-location-name">Hovedbygningen</h3>
-            <span class="lore-campus-name" id="result-campus-name">Gløshaugen</span>
-          </div>
-          <p class="lore-text" id="result-lore">
-            NTNUs mest ikoniske bygning i råkopp granitt, innviet i 1910. Kjent som Trondheims svar på Galtvort!
-          </p>
+        <!-- Location Info -->
+        <div class="result-location-card">
+          <h3 class="result-location-name" id="result-location-name">Hovedbygningen</h3>
+          <span class="result-campus-name" id="result-campus-name">Gløshaugen</span>
         </div>
 
         <button class="primary-btn" id="btn-next-round">

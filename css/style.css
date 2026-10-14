@@ -389,43 +389,7 @@ html, body {
   transform: scale(1.05);
 }
 
-.hud-btn.hint-btn {
-  color: var(--accent-gold);
-}
 
-/* Hint Popup Box */
-.hint-popup {
-  position: absolute;
-  top: 156px;
-  right: 76px;
-  width: 280px;
-  background: var(--bg-glass-card);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  box-shadow: var(--shadow-lg);
-  z-index: 60;
-  animation: fadeIn 0.2s ease;
-}
-
-.hint-popup-title {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--accent-gold);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-
-.hint-popup-text {
-  font-size: 0.88rem;
-  color: var(--text-main);
-  line-height: 1.4;
-}
 
 /* ==========================================================================
    INTERACTIVE MAP WIDGET
@@ -975,42 +939,30 @@ html, body {
   color: var(--text-secondary);
 }
 
-.lore-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--border-glass);
-  border-radius: var(--radius-md);
-  padding: 12px 14px;
-  margin-bottom: 16px;
-  max-height: 120px;
-  overflow-y: auto;
-}
-
-.lore-card-header {
+.result-location-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  margin-bottom: 16px;
 }
 
-.lore-location-name {
+.result-location-name {
   font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 700;
   color: #fff;
 }
 
-.lore-campus-name {
-  font-size: 0.75rem;
+.result-campus-name {
+  font-size: 0.72rem;
   font-weight: 700;
   color: var(--ntnu-cyan);
   text-transform: uppercase;
   letter-spacing: 1px;
-}
-
-.lore-text {
-  font-size: 0.9rem;
-  line-height: 1.55;
-  color: var(--text-secondary);
 }
 
 /* ==========================================================================

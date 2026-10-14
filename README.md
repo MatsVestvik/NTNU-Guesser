@@ -20,19 +20,12 @@ Et interaktivt nettleserspill inspirert av GeoGuessr – dedikert **100% til NTN
   - **All-Time Hall of Fame**: De beste poengsummene noensinne.
   - Rangeringsmedaljer (🥇 1. plass, 🥈 2. plass, 🥉 3. plass), poengsum, totalt avvik i meter, og tidsstempel.
   - Eget bruker-highlight («DEG») slik at du ser akkurat hvor du plasserer deg.
-- **🎯 20 Ekte NTNU-lokasjoner**:
-  - **Gløshaugen**: Hovedbygningen (front & øst), Realfagbygget (eksteriør & interiør), Sentralbygg 1 / Stripa, Gamle Fysikk, Gamle Kjemi, Gamle Elektro, Kjelhuset, Dødens Dal, lokomotivet Ohma Electra og utsikten mot Gløs!
-  - **Dragvoll**: Paviljongene, Gata og utsikten over åkrene.
-  - **Studentersamfundet i Trondhjem**: Det Røde Runde Huset og Elgeseter bru.
-  - **Tyholt**: Marinteknisk senter, biblioteket, skipstanken og Tyholttårnet.
-  - **Kalvskinnet**: Historiske Gunnerusbiblioteket.
-  - **Øya**: Kunnskapssenteret ved St. Olavs hospital.
-  - **Moholt Studentby**: Massivtre-tårnene på Moholt Allmenning.
+- **🎯 NTNU-lokasjoner**:
+  - Testsett med 5 utvalgte lokasjoner (Gløshaugen, Samfundet, Dragvoll).
 - **🧭 360° / Panoramavisning**:
   - Klikk og dra for å se deg rundt med realistisk fysikk og bevegelsestreghet.
   - Rullehjul / knapper for zoom (1x til 3.5x for å lese skilt og bygningskoder).
   - Levende kompassnål som roterer i sanntid etter synsfeltet ditt.
-  - Hint-knapp med kryptiske campus-gåter hvis du står fast.
 - **🗺️ Interaktivt Minikart**:
   - Bygget med Leaflet.
   - Bytte mellom høyoppløselig satellittbilde og detaljert gatekart.
