@@ -125,14 +125,11 @@ function drawBellCurve(canvas, playerScore, percentile, allScores = []) {
   ctx.lineTo(paddingLeft + plotW, paddingTop + plotH);
   ctx.closePath();
 
-  const fillGradient = ctx.createLinearGradient(paddingLeft, 0, playerX, 0);
-  fillGradient.addColorStop(0, 'rgba(0, 112, 243, 0.2)');
-  fillGradient.addColorStop(1, 'rgba(56, 189, 248, 0.55)');
-  ctx.fillStyle = fillGradient;
+  ctx.fillStyle = 'rgba(0, 80, 158, 0.35)';
   ctx.fill();
   ctx.restore();
 
-  // 3. Crisp Glowing Curve Outline
+  // 3. Crisp Clean Curve Outline
   ctx.beginPath();
   for (let x = 0; x <= plotW; x += 3) {
     const scoreVal = minScore + (x / plotW) * maxScore;
@@ -141,18 +138,16 @@ function drawBellCurve(canvas, playerScore, percentile, allScores = []) {
     if (x === 0) ctx.moveTo(paddingLeft + x, canvasY);
     else ctx.lineTo(paddingLeft + x, canvasY);
   }
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2.5;
   ctx.strokeStyle = '#38BDF8';
-  ctx.shadowColor = 'rgba(56, 189, 248, 0.6)';
-  ctx.shadowBlur = 10;
-  ctx.stroke();
   ctx.shadowBlur = 0;
+  ctx.stroke();
 
   // 4. Baseline
   ctx.beginPath();
   ctx.moveTo(paddingLeft, paddingTop + plotH);
   ctx.lineTo(paddingLeft + plotW, paddingTop + plotH);
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
   ctx.lineWidth = 1;
   ctx.stroke();
 
@@ -162,33 +157,30 @@ function drawBellCurve(canvas, playerScore, percentile, allScores = []) {
   ctx.moveTo(playerX, paddingTop + plotH);
   ctx.lineTo(playerX, playerCanvasY);
   ctx.strokeStyle = '#F59E0B';
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // 6. Glowing Marker Dot at Curve Peak for this Score
+  // 6. Marker Dot at Curve for this Score
   ctx.beginPath();
-  ctx.arc(playerX, playerCanvasY, 6.5, 0, Math.PI * 2);
+  ctx.arc(playerX, playerCanvasY, 5.5, 0, Math.PI * 2);
   ctx.fillStyle = '#F59E0B';
-  ctx.shadowColor = '#F59E0B';
-  ctx.shadowBlur = 14;
   ctx.fill();
-  ctx.shadowBlur = 0;
   ctx.strokeStyle = '#FFFFFF';
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2;
   ctx.stroke();
 
   // 7. Floating Pin Badge above Marker
-  const tagText = `DEG: ${playerScore.toLocaleString('no-NO')} p`;
-  ctx.font = 'bold 12px "JetBrains Mono", monospace';
-  const tagW = ctx.measureText(tagText).width + 18;
+  const tagText = `Din score: ${playerScore.toLocaleString('no-NO')} p`;
+  ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
+  const tagW = ctx.measureText(tagText).width + 16;
   const tagH = 26;
   const tagX = Math.max(paddingLeft, Math.min(w - paddingRight - tagW, playerX - tagW / 2));
-  const tagY = Math.max(6, playerCanvasY - 36);
+  const tagY = Math.max(6, playerCanvasY - 34);
 
-  ctx.fillStyle = 'rgba(13, 21, 39, 0.95)';
-  ctx.strokeStyle = '#F59E0B';
-  ctx.lineWidth = 1.5;
+  ctx.fillStyle = '#0F172A';
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.roundRect(tagX, tagY, tagW, tagH, 6);
   ctx.fill();
@@ -826,7 +818,7 @@ class NTNUGuesserGame {
 
   showRoundResultModal(data) {
     const isLastRound = this.currentRoundIndex + 1 >= this.totalRounds;
-    this.elements.btnNextRound.textContent = isLastRound ? "Se Sluttresultat & Kurve 📈" : "Neste runde ➔";
+    this.elements.btnNextRound.textContent = isLastRound ? "Se sluttresultat & kurve" : "Neste runde";
 
     const distFormatted = data.distance < 1000
       ? `${Math.round(data.distance)} meter`
@@ -840,19 +832,19 @@ class NTNUGuesserGame {
     let ratingText = "";
     let ratingClass = "high";
     if (data.distance <= 20) {
-      ratingText = "🌟 Bullseye! Ekte Sivilingeniør-presisjon!";
+      ratingText = "Bullseye! Ekte sivilingeniør-presisjon";
       ratingClass = "perfect";
     } else if (data.distance <= 75) {
-      ratingText = "🎯 Fantastisk treff!";
+      ratingText = "Meget bra treff!";
       ratingClass = "high";
     } else if (data.distance <= 250) {
-      ratingText = "👍 Ganske nærme!";
+      ratingText = "Ganske nærme";
       ratingClass = "medium";
     } else if (data.distance <= 700) {
-      ratingText = "🧭 Riktig nabolag, men litt på villspor.";
+      ratingText = "Riktig campusområde";
       ratingClass = "low";
     } else {
-      ratingText = "🚌 Tok du feil buss til Dragvoll?";
+      ratingText = "Langt unna målet";
       ratingClass = "fail";
     }
     this.elements.resultRating.textContent = ratingText;
@@ -903,7 +895,6 @@ class NTNUGuesserGame {
   async showGameOver() {
     this.gameActive = false;
     soundManager.playVictory();
-    this.launchConfetti();
 
     this.elements.finalScore.textContent = `${this.totalScore.toLocaleString('no-NO')} / 25 000`;
 
@@ -911,19 +902,19 @@ class NTNUGuesserGame {
     let rankTitle = "";
     let desc = "";
     if (this.totalScore >= 24000) {
-      rankTitle = "Sivilingeniør i NTNU-geografi 🎓👑";
+      rankTitle = "Sivilingeniør i NTNU-geografi";
       desc = "Eksepsjonell innsats! Du kjenner hver eneste brostein og auditorium på campus bedre enn rektor!";
     } else if (this.totalScore >= 20000) {
-      rankTitle = "Mastergrad i Stripa & Samfundet-Høvding 🌟";
+      rankTitle = "Mastergrad i campus-geografi";
       desc = "Imponerende lokalkunnskap! Du navigerer Trondheim på autopilot, selv etter en lang kveld på Bodegaen.";
     } else if (this.totalScore >= 15000) {
-      rankTitle = "Bachelorgrad i Campus-Orientering 🗺️";
+      rankTitle = "Bachelorgrad i campus-orientering";
       desc = "Godt levert! Du finner veien til de fleste forelesninger, men har kanskje unngått krikene på Tyholt.";
     } else if (this.totalScore >= 10000) {
-      rankTitle = "Forvillet Førsteklassing på jakt etter R1 🎒";
+      rankTitle = "Førsteklassing på jakt etter R1";
       desc = "Helt greit, men du har nok virret en del rundt i Sentralbygg og lurt på hvor heisen ender.";
     } else {
-      rankTitle = "Tok linje 3 til feil ende av byen 🚌💨";
+      rankTitle = "Tok linje 3 til feil ende av byen";
       desc = "Du endte visst opp på feil campus... Anbefaler en guidet tur langs Høgskoleringen og et vaffelhjerte på Stripa!";
     }
 
@@ -1039,19 +1030,22 @@ class NTNUGuesserGame {
   populateLeaderboardTable(entries, tbody) {
     if (!tbody) return;
     if (!entries || entries.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94A3B8;">Ingen resultater registrert ennå. Bli den første! 🚀</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94A3B8;">Ingen resultater registrert ennå.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = '';
-    const medals = ['🥇', '🥈', '🥉'];
 
     entries.forEach((r, idx) => {
       const tr = document.createElement('tr');
       const isUser = this.playerName && r.name.toLowerCase() === this.playerName.toLowerCase();
       if (isUser) tr.classList.add('user-row');
 
-      const rankBadge = medals[idx] ? `<span class="medal-icon">${medals[idx]}</span>` : `${idx + 1}.`;
+      let rankBadge = `<span class="rank-badge-other">${idx + 1}.</span>`;
+      if (idx === 0) rankBadge = `<span class="rank-badge rank-badge-1">1</span>`;
+      else if (idx === 1) rankBadge = `<span class="rank-badge rank-badge-2">2</span>`;
+      else if (idx === 2) rankBadge = `<span class="rank-badge rank-badge-3">3</span>`;
+
       const distStr = r.totalDistance < 1000 ? `${Math.round(r.totalDistance)} m` : `${(r.totalDistance / 1000).toFixed(1)} km`;
 
       let timeStr = "";
@@ -1061,7 +1055,7 @@ class NTNUGuesserGame {
       }
 
       tr.innerHTML = `
-        <td style="font-weight: 800; text-align: center;">${rankBadge}</td>
+        <td style="font-weight: 700; text-align: center;">${rankBadge}</td>
         <td><strong>${this.escapeHtml(r.name)}</strong>${isUser ? ' <span class="user-badge">DEG</span>' : ''}</td>
         <td><span class="score-pill">${r.score.toLocaleString('no-NO')}</span></td>
         <td style="color: #94A3B8;">${distStr}</td>
@@ -1072,24 +1066,18 @@ class NTNUGuesserGame {
   }
 
   shareScoreToClipboard() {
-    let emojiRounds = "";
+    let roundsSummary = "";
     this.roundsData.forEach(r => {
-      let icon = "🟩";
-      if (r.score >= 4600) icon = "🟩";
-      else if (r.score >= 3800) icon = "🟨";
-      else if (r.score >= 2000) icon = "🟧";
-      else icon = "🟥";
-
       const dist = r.distance !== null
         ? (r.distance < 1000 ? `${Math.round(r.distance)}m` : `${(r.distance/1000).toFixed(1)}km`)
         : '0m';
-      emojiRounds += `\n${icon} R${r.round}: ${r.score}p (${dist})`;
+      roundsSummary += `\n• R${r.round}: ${r.score} poeng (${dist})`;
     });
 
-    const shareText = `📍 NTNU GUESSER • Dagens Utfordring #${this.dayNumber}\nSpiller: ${this.playerName || "Gløsing"}\nPoeng: ${this.totalScore.toLocaleString('no-NO')} / 25 000 (#${this.rank})\n📈 Bedre enn ${this.percentile}% av spillerne!${emojiRounds}\n\nSpill nå: NTNU-Guesser!`;
+    const shareText = `NTNU GUESSER • Dagens utfordring #${this.dayNumber}\nSpiller: ${this.playerName || "Spiller"}\nPoeng: ${this.totalScore.toLocaleString('no-NO')} / 25 000 (Plass #${this.rank})\nBedre enn ${this.percentile}% av spillerne${roundsSummary}\n\nSpill nå: NTNU-Guesser!`;
 
     navigator.clipboard.writeText(shareText).then(() => {
-      this.elements.shareFeedback.textContent = "Kopiert til utklippstavlen! 📋";
+      this.elements.shareFeedback.textContent = "Kopiert til utklippstavlen";
       this.elements.shareFeedback.classList.remove('hidden');
       setTimeout(() => {
         this.elements.shareFeedback.classList.add('hidden');

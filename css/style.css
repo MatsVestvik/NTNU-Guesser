@@ -103,20 +103,18 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--ntnu-blue), var(--ntnu-cyan));
+  background: var(--ntnu-navy);
   border-radius: var(--radius-md);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .brand-title {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #FFFFFF 30%, var(--ntnu-cyan) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #FFFFFF;
 }
 
 .brand-tag {
@@ -601,25 +599,18 @@ html, body {
 }
 
 .guess-btn.ready {
-  background: linear-gradient(135deg, #0070F3, #00C48C);
+  background: var(--ntnu-navy);
   color: #FFFFFF;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(0, 196, 140, 0.4);
-  animation: pulseReady 1.6s infinite alternate;
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .guess-btn.ready:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 196, 140, 0.6);
+  background: #0060be;
 }
 
 .guess-btn.ready:active {
   transform: translateY(1px);
-}
-
-@keyframes pulseReady {
-  from { box-shadow: 0 4px 18px rgba(0, 196, 140, 0.3); }
-  to { box-shadow: 0 4px 26px rgba(0, 112, 243, 0.7); }
 }
 
 /* ==========================================================================
@@ -748,11 +739,9 @@ html, body {
 
 .modal-title {
   font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #FFFFFF 40%, var(--ntnu-cyan) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
 }
 
 .modal-desc {
@@ -817,24 +806,22 @@ html, body {
 }
 
 .radio-card input:checked + label {
-  background: rgba(0, 112, 243, 0.2);
+  background: rgba(0, 80, 158, 0.2);
   border-color: var(--ntnu-blue);
-  box-shadow: 0 0 16px rgba(0, 112, 243, 0.3);
 }
 
 .primary-btn {
   width: 100%;
-  height: 50px;
+  height: 48px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--ntnu-blue), #00A6FB);
-  border: none;
+  background: var(--ntnu-navy);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1rem;
+  font-weight: 700;
   color: #fff;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(0, 112, 243, 0.4);
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -842,8 +829,8 @@ html, body {
 }
 
 .primary-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(0, 112, 243, 0.6);
+  background: #0060be;
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .secondary-btn {
@@ -1004,21 +991,19 @@ html, body {
    ========================================================================== */
 
 .diploma-card {
-  background: linear-gradient(135deg, rgba(0, 80, 158, 0.3), rgba(0, 112, 243, 0.1));
-  border: 1px solid rgba(0, 112, 243, 0.4);
+  background: #111C30;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
   padding: 24px;
   text-align: center;
   margin-bottom: 24px;
-  box-shadow: 0 0 30px rgba(0, 112, 243, 0.2);
 }
 
 .diploma-total-score {
   font-family: var(--font-mono);
   font-size: 2.6rem;
   font-weight: 800;
-  color: var(--accent-gold);
-  text-shadow: 0 0 20px var(--accent-gold-glow);
+  color: #FFFFFF;
   margin-bottom: 8px;
 }
 
@@ -1233,11 +1218,11 @@ html, body {
   display: inline-block;
   padding: 4px 12px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(239, 68, 68, 0.2));
-  border: 1px solid rgba(245, 158, 11, 0.5);
-  color: var(--accent-gold);
+  background: rgba(0, 80, 158, 0.15);
+  border: 1px solid rgba(0, 102, 204, 0.35);
+  color: #93C5FD;
   font-size: 0.75rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
   margin-bottom: 12px;
@@ -1277,8 +1262,7 @@ html, body {
 }
 
 .simplified-name-box input:focus {
-  border-color: var(--ntnu-cyan);
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+  border-color: var(--ntnu-blue);
   background: rgba(8, 13, 26, 0.95);
 }
 
@@ -1290,12 +1274,12 @@ html, body {
 
 .start-game-btn {
   width: 100%;
-  height: 54px;
-  font-size: 1.1rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
+  height: 52px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
   border-radius: var(--radius-md);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
 }
 
 .start-game-btn:disabled {
@@ -1303,20 +1287,19 @@ html, body {
   color: rgba(255, 255, 255, 0.35) !important;
   box-shadow: none !important;
   cursor: not-allowed !important;
-  transform: none !important;
+  border: 1px solid transparent !important;
 }
 
 .start-game-btn:not(:disabled) {
-  background: linear-gradient(135deg, var(--ntnu-blue), #00C48C) !important;
+  background: var(--ntnu-navy) !important;
   color: #FFFFFF !important;
-  box-shadow: 0 4px 20px rgba(0, 196, 140, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
   cursor: pointer !important;
-  animation: pulseStartBtn 1.8s infinite alternate;
 }
 
-@keyframes pulseStartBtn {
-  from { box-shadow: 0 4px 18px rgba(0, 196, 140, 0.35); }
-  to { box-shadow: 0 6px 28px rgba(56, 189, 248, 0.7); }
+.start-game-btn:not(:disabled):hover {
+  background: #0060be !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
 }
 
 .start-modal-footer {
@@ -1327,10 +1310,10 @@ html, body {
 .link-btn {
   background: none;
   border: none;
-  color: var(--accent-gold);
+  color: var(--text-secondary);
   font-family: var(--font-display);
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   padding: 6px 12px;
   border-radius: var(--radius-full);
@@ -1338,8 +1321,8 @@ html, body {
 }
 
 .link-btn:hover {
-  background: rgba(245, 158, 11, 0.12);
-  text-decoration: underline;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 /* ==========================================================================
@@ -1347,12 +1330,11 @@ html, body {
    ========================================================================== */
 
 .bell-curve-section {
-  background: linear-gradient(135deg, rgba(8, 13, 26, 0.95), rgba(15, 23, 42, 0.85));
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: #0F172A;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 22px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .bell-curve-header {
@@ -1363,17 +1345,16 @@ html, body {
 .percentile-headline {
   font-family: var(--font-display);
   font-size: 1.35rem;
-  font-weight: 800;
+  font-weight: 700;
   color: #FFFFFF;
   margin-bottom: 4px;
 }
 
 .percentile-value {
-  color: var(--accent-gold);
+  color: #38BDF8;
   font-size: 1.6rem;
   font-family: var(--font-mono);
-  font-weight: 900;
-  text-shadow: 0 0 15px var(--accent-gold-glow);
+  font-weight: 800;
 }
 
 .percentile-subtext {
@@ -1539,12 +1520,49 @@ html, body {
 
 .user-badge {
   font-size: 0.68rem;
-  font-weight: 800;
-  background: var(--ntnu-blue);
+  font-weight: 700;
+  background: var(--ntnu-navy);
   color: #fff;
   padding: 2px 6px;
   border-radius: 4px;
   margin-left: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Minimalist rank badges */
+.rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+}
+
+.rank-badge-1 {
+  background: rgba(245, 158, 11, 0.18);
+  color: #F59E0B;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.rank-badge-2 {
+  background: rgba(148, 163, 184, 0.18);
+  color: #E2E8F0;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.rank-badge-3 {
+  background: rgba(180, 83, 9, 0.18);
+  color: #FBBF24;
+  border: 1px solid rgba(180, 83, 9, 0.35);
+}
+
+.rank-badge-other {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
 }
 
 .modal-footer-row {
@@ -1561,8 +1579,8 @@ html, body {
 
 .clock-digits {
   font-family: var(--font-mono);
-  font-weight: 800;
-  color: var(--accent-gold);
+  font-weight: 700;
+  color: var(--text-main);
 }
 
 .primary-btn.compact {
@@ -1571,42 +1589,26 @@ html, body {
   height: 42px;
 }
 
-.leaderboard-placement-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 14px;
-  padding: 10px 16px;
-  background: rgba(245, 158, 11, 0.15);
-  border: 1px solid rgba(245, 158, 11, 0.4);
-  border-radius: var(--radius-full);
-  color: var(--accent-gold);
-  font-weight: 700;
-  font-size: 0.95rem;
-}
-
 .back-to-summary-btn {
   position: fixed;
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 170;
-  padding: 12px 24px;
-  background: var(--bg-glass-card);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--ntnu-cyan);
+  padding: 10px 20px;
+  background: var(--bg-dark);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-full);
   color: #FFFFFF;
   font-family: var(--font-display);
-  font-size: 0.95rem;
-  font-weight: 800;
-  box-shadow: 0 0 25px rgba(0, 112, 243, 0.6);
+  font-size: 0.9rem;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .back-to-summary-btn:hover {
   transform: translateX(-50%) translateY(-2px);
-  background: var(--ntnu-blue);
+  background: var(--ntnu-navy);
 }
