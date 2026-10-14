@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NTNU Guesser - Hvor godt kjenner du NTNU?</title>
+  <meta name="description" content="Et interaktivt GeoGuessr-spill eksklusivt for NTNUs campuser: Gløshaugen, Dragvoll, Samfundet, Kalvskinnet, Tyholt og Øya!">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Local Leaflet with CDN fallback -->
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
+
+  <!-- Main Game Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📍</text></svg>">
+</head>
+<body>
+  <div id="app">
+    <!-- ================= TOP HEADER / HUD ================= -->
+    <header class="game-header">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+        </div>
+        <div class="brand-title">NTNU GUESSER</div>
+        <span class="brand-tag">TRONDHEIM</span>
+      </div>
+
+      <div class="hud-center">
+        <div class="hud-pill" id="round-display">Runde 1 / 5</div>
+        <div class="hud-pill highlight" id="score-display">Poeng: 0</div>
+        <div class="hud-pill timer-pill hidden" id="timer-badge">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <span id="timer-display">1:00</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="mute-btn" title="Lyd av/på">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </button>
+        <button class="icon-btn" id="help-btn" title="Hvordan spille">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </button>
+        <button class="icon-btn" id="settings-btn" title="Innstillinger & Modus">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= PANORAMA VIEWPORT ================= -->
+    <main class="viewport-container" id="viewer-container">
+      <img class="panorama-img" id="location-image" src="" alt="NTNU Location">
+      <div class="viewport-vignette"></div>
+
+      <!-- Loading Spinner -->
+      <div class="viewport-loader">
+        <div class="spinner"></div>
+        <p style="font-weight: 600; font-size: 0.95rem; color: #94A3B8;">Laster NTNU-lokasjon...</p>
+      </div>
+
+      <!-- Dynamic Compass Rose -->
+      <div class="compass-widget" id="compass-widget">
+        <div class="compass-dial">
+          <div class="compass-needle"></div>
+        </div>
+        <div class="compass-degrees">0° N</div>
+      </div>
+
+      <!-- Floating Viewport Controls -->
+      <div class="viewport-hud-controls">
+        <button class="hud-btn" id="btn-zoom-in" title="Zoom inn (+)">+</button>
+        <button class="hud-btn" id="btn-zoom-out" title="Zoom ut (-)">−</button>
+        <button class="hud-btn" id="btn-reset-view" title="Tilbakestill visning (⟲)">⟲</button>
+        <button class="hud-btn" id="btn-fullscreen" title="Fullskjerm">⛶</button>
+        <button class="hud-btn hint-btn" id="btn-hint" title="Trenger du et hint?">💡</button>
+      </div>
+
+      <!-- Hint Box -->
+      <div class="hint-popup hidden" id="hint-box">
+        <div class="hint-popup-title">
+          <span>💡 Campus-Hint</span>
+        </div>
+        <div class="hint-popup-text" id="hint-text">
+          Se deg godt rundt etter karakteristiske fasader og detaljer.
+        </div>
+      </div>
+    </main>
+
+    <!-- ================= INTERACTIVE GUESS MAP ================= -->
+    <div class="map-widget-container" id="map-widget">
+      <!-- Top toolbar: Campus fast-jump pills + tools -->
+      <div class="map-bar">
+        <div class="campus-pills-scroll" id="campus-pills">
+          <!-- Dynamically populated from JS -->
+        </div>
+        <div class="map-tools">
+          <button class="map-tool-btn" id="btn-toggle-layer" title="Bytt til gatekart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          </button>
+          <button class="map-tool-btn" id="btn-toggle-map-size" title="Forstørr / Fest kart">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Leaflet container -->
+      <div class="guess-map-canvas" id="guess-map"></div>
+
+      <!-- Footer: GUESS HERE button -->
+      <div class="map-footer">
+        <button class="guess-btn" id="btn-guess" disabled>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          Gjett her
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= WELCOME / CONFIG MODAL ================= -->
+    <div class="modal-backdrop" id="start-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 class="modal-title">Velkommen til NTNU Guesser!</h2>
+        </div>
+        <p class="modal-desc">
+          Test lokalkunnskapen din! Du blir plassert et hemmelig sted på NTNUs campuser i Trondheim. Se deg rundt, zoom inn på detaljer og plasser nålen på kartet.
+        </p>
+
+        <!-- Campus Selection -->
+        <div class="config-group">
+          <span class="config-label">Velg Campus</span>
+          <div class="radio-cards-grid">
+            <div class="radio-card">
+              <input type="radio" name="campus-filter" id="filter-all" value="all" checked>
+              <label for="filter-all">
+                <strong>Alle Campuser</strong>
+                <span>Gløs, Dragvoll, Samfundet, Tyholt, Øya & Kalvskinnet</span>
+              </label>
+            </div>
+            <div class="radio-card">
+              <input type="radio" name="campus-filter" id="filter-gloshaugen" value="gloshaugen">
+              <label for="filter-gloshaugen">
+                <strong>Kun Gløshaugen</strong>
+                <span>Hovedbygningen, Stripa, Realfagbygget og kriker & kroker</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timer Selection -->
+        <div class="config-group">
+          <span class="config-label">Tidsfrist per runde</span>
+          <div class="radio-cards-grid">
+            <div class="radio-card">
+              <input type="radio" name="timer-duration" id="timer-none" value="0" checked>
+              <label for="timer-none">
+                <strong>Ingen tid</strong>
+                <span>Chille og utforske</span>
+              </label>
+            </div>
+            <div class="radio-card">
+              <input type="radio" name="timer-duration" id="timer-60" value="60">
+              <label for="timer-60">
+                <strong>60 sekunder</strong>
+                <span>Klassisk tempo</span>
+              </label>
+            </div>
+            <div class="radio-card">
+              <input type="radio" name="timer-duration" id="timer-30" value="30">
+              <label for="timer-30">
+                <strong>30 sekunder</strong>
+                <span>Speedrun for proffer</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button class="primary-btn" id="btn-start-game">
+          Start Spillet 🚀
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= ROUND RESULT OVERLAY ================= -->
+    <div class="modal-backdrop hidden" id="round-result-modal">
+      <div class="modal-card">
+        <div class="result-stat-banner">
+          <div>
+            <span style="font-size: 0.8rem; font-weight: 700; color: #94A3B8; text-transform: uppercase;">Avstand</span>
+            <div class="result-distance" id="result-distance">38 meter</div>
+          </div>
+          <div style="text-align: right;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: #94A3B8; text-transform: uppercase;">Poeng</span>
+            <div class="result-points" id="result-points">+4 820 poeng</div>
+          </div>
+        </div>
+
+        <div class="result-badge high" id="result-rating">🎯 Fantastisk treff!</div>
+
+        <!-- Location Fact / Lore -->
+        <div class="lore-card">
+          <div class="lore-card-header">
+            <h3 class="lore-location-name" id="result-location-name">Hovedbygningen</h3>
+            <span class="lore-campus-name" id="result-campus-name">Gløshaugen</span>
+          </div>
+          <p class="lore-text" id="result-lore">
+            NTNUs mest ikoniske bygning i råkopp granitt, innviet i 1910. Kjent som Trondheims svar på Galtvort!
+          </p>
+        </div>
+
+        <button class="primary-btn" id="btn-next-round">
+          Neste runde ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- ================= GAME OVER / FINAL SUMMARY MODAL ================= -->
+    <div class="modal-backdrop hidden" id="game-over-modal">
+      <div class="modal-card wide">
+        <div class="diploma-card">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 1px;">Totalt Resultat</div>
+          <div class="diploma-total-score" id="final-score">23 850 / 25 000</div>
+          <div class="diploma-rank-title" id="final-rank-title">Sivilingeniør i NTNU-geografi 🎓👑</div>
+          <p class="diploma-rank-desc" id="final-rank-desc">
+            Eksepsjonell innsats! Du kjenner hver eneste brostein og auditorium på campus!
+          </p>
+        </div>
+
+        <div class="recap-table-container">
+          <table class="recap-table">
+            <thead>
+              <tr>
+                <th>Bilde</th>
+                <th>Lokasjon</th>
+                <th>Avstand</th>
+                <th>Poeng</th>
+              </tr>
+            </thead>
+            <tbody id="recap-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="game-over-actions">
+          <button class="secondary-btn" id="btn-share-score">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            Del Resultat
+          </button>
+          <button class="primary-btn" id="btn-play-again">
+            Spill Igjen 🔄
+          </button>
+        </div>
+        <div class="share-feedback hidden" id="share-feedback">Kopiert til utklippstavlen! 📋</div>
+      </div>
+    </div>
+
+    <!-- ================= HOW TO PLAY MODAL ================= -->
+    <div class="modal-backdrop hidden" id="help-modal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2 class="modal-title">Slik spiller du</h2>
+          <button class="icon-btn" id="btn-close-help">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="background: rgba(0, 112, 243, 0.2); color: #38BDF8; font-weight: 800; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
+            <div>
+              <strong style="display: block; margin-bottom: 4px;">Utforsk omgivelsene</strong>
+              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Klikk og dra for å se deg rundt i 360°. Bruk rullehjulet eller +/- knappene for å zoome inn på skilt, fasader og landemerker.</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="background: rgba(16, 185, 129, 0.2); color: #10B981; font-weight: 800; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</div>
+            <div>
+              <strong style="display: block; margin-bottom: 4px;">Finn stedet på kartet</strong>
+              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Bruk minikartet nede til høyre. Du kan klikke på hurtigknappene (Gløs, Dragvoll, Samfundet osv.) for å hoppe rett til rett campus!</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 14px; align-items: flex-start;">
+            <div style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; font-weight: 800; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
+            <div>
+              <strong style="display: block; margin-bottom: 4px;">Plasser nålen & gjett</strong>
+              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Klikk på kartet for å sette en markør. Trykk "GJETT HER" for å bekrefte. Jo nærmere du treffer (innen 15 meter er perfekt 5 000 poeng!), jo mer heder og ære får du!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confetti canvas for victory celebration -->
+    <canvas id="confetti-canvas"></canvas>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/vendor/leaflet/leaflet.js"></script>
+  <script src="js/locations.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/viewer.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

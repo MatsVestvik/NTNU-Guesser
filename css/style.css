@@ -1,0 +1,1131 @@
+/* ==========================================================================
+   NTNU GUESSER - PREMIUM DESIGN SYSTEM & STYLES
+   ========================================================================== */
+
+:root {
+  --bg-deep: #080D1A;
+  --bg-dark: #0D1527;
+  --bg-glass: rgba(13, 21, 39, 0.82);
+  --bg-glass-card: rgba(18, 28, 51, 0.88);
+  --bg-glass-light: rgba(255, 255, 255, 0.06);
+
+  --ntnu-navy: #00509E;
+  --ntnu-blue: #0070F3;
+  --ntnu-cyan: #38BDF8;
+  --ntnu-ice: #E0F2FE;
+
+  --accent-gold: #F59E0B;
+  --accent-gold-glow: rgba(245, 158, 11, 0.4);
+  --accent-green: #10B981;
+  --accent-green-glow: rgba(16, 185, 129, 0.4);
+  --accent-red: #EF4444;
+
+  --text-main: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --border-glass: rgba(255, 255, 255, 0.12);
+  --border-glow: rgba(56, 189, 248, 0.35);
+
+  --shadow-lg: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 25px rgba(0, 112, 243, 0.45);
+
+  --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-body);
+  background-color: var(--bg-deep);
+  color: var(--text-main);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* App Container */
+#app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   HEADER / NAVBAR
+   ========================================================================== */
+
+.game-header {
+  position: absolute;
+  top: 16px;
+  left: 20px;
+  right: 20px;
+  height: 64px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--ntnu-blue), var(--ntnu-cyan));
+  border-radius: var(--radius-md);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 112, 243, 0.4);
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #FFFFFF 30%, var(--ntnu-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-tag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--ntnu-cyan);
+  background: rgba(56, 189, 248, 0.12);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: 4px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+/* Game Status HUD */
+.hud-center {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hud-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-glass);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.hud-pill.highlight {
+  border-color: rgba(0, 112, 243, 0.4);
+  background: rgba(0, 112, 243, 0.15);
+  color: var(--ntnu-cyan);
+}
+
+.timer-pill {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--accent-gold);
+}
+
+.timer-pill.urgent {
+  border-color: var(--accent-red);
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--accent-red);
+  animation: pulseUrgent 1s infinite alternate;
+}
+
+@keyframes pulseUrgent {
+  from { transform: scale(1); box-shadow: 0 0 0 rgba(239, 68, 68, 0); }
+  to { transform: scale(1.06); box-shadow: 0 0 16px rgba(239, 68, 68, 0.6); }
+}
+
+/* Header Action Controls */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-glass);
+  background: var(--bg-glass-light);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.icon-btn:active {
+  transform: translateY(1px);
+}
+
+/* ==========================================================================
+   VIEWPORT / STREET VIEW PANORAMA
+   ========================================================================== */
+
+.viewport-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+  cursor: grab;
+  background-color: #030712;
+  overflow: hidden;
+}
+
+.viewport-container.grabbing {
+  cursor: grabbing;
+}
+
+.panorama-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform-origin: center center;
+  transition: filter 0.3s ease;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.viewport-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 40%, rgba(3, 7, 18, 0.4) 85%, rgba(3, 7, 18, 0.7) 100%);
+  z-index: 12;
+}
+
+/* Loading Overlay */
+.viewport-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 13, 26, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.viewport-container.loading .viewport-loader {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(0, 112, 243, 0.2);
+  border-top-color: var(--ntnu-cyan);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Compass Widget */
+.compass-widget {
+  position: absolute;
+  top: 96px;
+  left: 24px;
+  z-index: 50;
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px);
+  border: 1px solid var(--border-glass);
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+}
+
+.compass-dial {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compass-needle {
+  width: 4px;
+  height: 22px;
+  position: relative;
+  transition: transform 0.1s linear;
+}
+
+.compass-needle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #EF4444;
+  border-radius: 2px 2px 0 0;
+}
+
+.compass-needle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  background: #E2E8F0;
+  border-radius: 0 0 2px 2px;
+}
+
+.compass-degrees {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+  min-width: 65px;
+}
+
+/* Floating Viewport HUD Controls */
+.viewport-hud-controls {
+  position: absolute;
+  top: 96px;
+  right: 24px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hud-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-glass);
+  background: var(--bg-glass);
+  backdrop-filter: blur(14px);
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: all 0.2s ease;
+}
+
+.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+.hud-btn.hint-btn {
+  color: var(--accent-gold);
+}
+
+/* Hint Popup Box */
+.hint-popup {
+  position: absolute;
+  top: 156px;
+  right: 76px;
+  width: 280px;
+  background: var(--bg-glass-card);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-lg);
+  z-index: 60;
+  animation: fadeIn 0.2s ease;
+}
+
+.hint-popup-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.hint-popup-text {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.4;
+}
+
+/* ==========================================================================
+   INTERACTIVE MAP WIDGET
+   ========================================================================== */
+
+.map-widget-container {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  width: 360px;
+  height: 280px;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom right;
+}
+
+/* Expand on Hover unless disabled */
+.map-widget-container:not(.pinned-large):hover {
+  width: 480px;
+  height: 380px;
+}
+
+/* Pinned Large state */
+.map-widget-container.pinned-large {
+  width: 680px;
+  height: 520px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 120px);
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-glow), var(--shadow-lg);
+}
+
+/* Map Header Bar */
+.map-bar {
+  height: 42px;
+  background: rgba(8, 13, 26, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  border-bottom: 1px solid var(--border-glass);
+  z-index: 5;
+}
+
+.campus-pills-scroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+
+.campus-pills-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.campus-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--bg-glass-light);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.campus-pill:hover {
+  background: rgba(0, 112, 243, 0.25);
+  color: #fff;
+  border-color: var(--ntnu-blue);
+}
+
+.map-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+}
+
+.map-tool-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.map-tool-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* The Leaflet Canvas */
+.guess-map-canvas {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: #111827;
+  cursor: crosshair;
+}
+
+/* Guess Button Footer */
+.map-footer {
+  padding: 10px;
+  background: rgba(8, 13, 26, 0.85);
+  border-top: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+
+.guess-btn {
+  width: 100%;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: none;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  background: #1E293B;
+  cursor: not-allowed;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.guess-btn.ready {
+  background: linear-gradient(135deg, #0070F3, #00C48C);
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 196, 140, 0.4);
+  animation: pulseReady 1.6s infinite alternate;
+}
+
+.guess-btn.ready:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 196, 140, 0.6);
+}
+
+.guess-btn.ready:active {
+  transform: translateY(1px);
+}
+
+@keyframes pulseReady {
+  from { box-shadow: 0 4px 18px rgba(0, 196, 140, 0.3); }
+  to { box-shadow: 0 4px 26px rgba(0, 112, 243, 0.7); }
+}
+
+/* ==========================================================================
+   CUSTOM LEAFLET MARKERS & PINS
+   ========================================================================== */
+
+.pin-icon-wrapper {
+  background: transparent;
+  border: none;
+}
+
+.custom-map-pin {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pinDrop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pinDrop {
+  0% { transform: translateY(-40px) scale(0.6); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.pin-pulse {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+  width: 24px;
+  height: 24px;
+  border: 2px solid;
+  border-radius: 50%;
+  animation: radarWave 1.5s infinite ease-out;
+  pointer-events: none;
+}
+
+@keyframes radarWave {
+  0% { width: 4px; height: 4px; opacity: 1; }
+  100% { width: 36px; height: 36px; opacity: 0; }
+}
+
+/* Leaflet Overrides */
+.leaflet-popup-content-wrapper {
+  background: var(--bg-glass-card) !important;
+  backdrop-filter: blur(14px) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-glass) !important;
+  border-radius: var(--radius-md) !important;
+  font-family: var(--font-body) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-glass-card) !important;
+}
+
+.leaflet-control-zoom a {
+  background: var(--bg-glass-card) !important;
+  color: #fff !important;
+  border-color: var(--border-glass) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ==========================================================================
+   MODALS & OVERLAYS
+   ========================================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(3, 7, 18, 0.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+.modal-backdrop.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-card {
+  background: var(--bg-glass-card);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 0, 0, 0.5);
+  width: 100%;
+  max-width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  position: relative;
+  transform: translateY(0) scale(1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalEnter {
+  from { transform: translateY(20px) scale(0.95); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-card.wide {
+  max-width: 760px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #FFFFFF 40%, var(--ntnu-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.modal-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+/* Config Section inside Modal */
+.config-group {
+  margin-bottom: 22px;
+}
+
+.config-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.radio-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.radio-card {
+  position: relative;
+}
+
+.radio-card input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-card label {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 14px;
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.radio-card label strong {
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin-bottom: 4px;
+}
+
+.radio-card label span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.radio-card input:checked + label {
+  background: rgba(0, 112, 243, 0.2);
+  border-color: var(--ntnu-blue);
+  box-shadow: 0 0 16px rgba(0, 112, 243, 0.3);
+}
+
+.primary-btn {
+  width: 100%;
+  height: 50px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--ntnu-blue), #00A6FB);
+  border: none;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 112, 243, 0.4);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 112, 243, 0.6);
+}
+
+.secondary-btn {
+  width: 100%;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-glass);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ==========================================================================
+   ROUND RESULT MODAL
+   ========================================================================== */
+
+.result-stat-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px;
+  background: rgba(0, 112, 243, 0.1);
+  border: 1px solid rgba(0, 112, 243, 0.25);
+  border-radius: var(--radius-md);
+  margin-bottom: 20px;
+}
+
+.result-distance {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.result-points {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+}
+
+.result-badge {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.result-badge.perfect {
+  background: rgba(16, 185, 129, 0.2);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+}
+
+.result-badge.high {
+  background: rgba(56, 189, 248, 0.2);
+  border: 1px solid var(--ntnu-cyan);
+  color: var(--ntnu-cyan);
+}
+
+.result-badge.medium {
+  background: rgba(245, 158, 11, 0.2);
+  border: 1px solid var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.result-badge.low {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid var(--accent-red);
+  color: var(--accent-red);
+}
+
+.result-badge.fail {
+  background: rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.lore-card {
+  background: var(--bg-glass-light);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  margin-bottom: 24px;
+}
+
+.lore-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.lore-location-name {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.lore-campus-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ntnu-cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.lore-text {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   GAME OVER / FINAL RECAP MODAL
+   ========================================================================== */
+
+.diploma-card {
+  background: linear-gradient(135deg, rgba(0, 80, 158, 0.3), rgba(0, 112, 243, 0.1));
+  border: 1px solid rgba(0, 112, 243, 0.4);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 24px;
+  box-shadow: 0 0 30px rgba(0, 112, 243, 0.2);
+}
+
+.diploma-total-score {
+  font-family: var(--font-mono);
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: var(--accent-gold);
+  text-shadow: 0 0 20px var(--accent-gold-glow);
+  margin-bottom: 8px;
+}
+
+.diploma-rank-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.diploma-rank-desc {
+  font-size: 0.92rem;
+  color: var(--ntnu-ice);
+  line-height: 1.5;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Recap Table */
+.recap-table-container {
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-glass);
+  margin-bottom: 24px;
+}
+
+.recap-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.recap-table th {
+  background: rgba(8, 13, 26, 0.9);
+  padding: 10px 14px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-glass);
+  position: sticky;
+  top: 0;
+}
+
+.recap-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  vertical-align: middle;
+}
+
+.recap-thumb {
+  width: 44px;
+  height: 32px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.score-pill {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+.game-over-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.share-feedback {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--accent-green);
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+/* Confetti Canvas */
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 250;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (TABLET & MOBILE)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .game-header {
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    padding: 0 12px;
+    height: 56px;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .brand-tag {
+    display: none;
+  }
+
+  .hud-center {
+    gap: 8px;
+  }
+
+  .hud-pill {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .compass-widget {
+    top: 76px;
+    left: 12px;
+    padding: 6px 10px;
+  }
+
+  .viewport-hud-controls {
+    top: 76px;
+    right: 12px;
+  }
+
+  .map-widget-container {
+    bottom: 12px;
+    right: 12px;
+    width: 260px;
+    height: 200px;
+  }
+
+  .map-widget-container:not(.pinned-large):hover {
+    width: 320px;
+    height: 240px;
+  }
+
+  .map-widget-container.pinned-large {
+    width: calc(100vw - 24px);
+    height: 380px;
+  }
+
+  .modal-card {
+    padding: 20px;
+  }
+
+  .game-over-actions {
+    grid-template-columns: 1fr;
+  }
+}
