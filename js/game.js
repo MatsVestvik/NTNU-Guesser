@@ -239,7 +239,7 @@ class NTNUGuesserGame {
     this.cacheElements();
 
     // Controllers
-    this.viewer = new PanoramaViewer('viewer-container', 'location-image', 'compass-widget');
+    this.viewer = new PanoramaViewer('viewer-container', 'location-image');
     this.gameMap = new GameMap('guess-map', {
       onPinPlaced: (coords) => this.handlePinPlaced(coords)
     });
@@ -706,8 +706,7 @@ class NTNUGuesserGame {
     this.currentLocation = this.selectedLocations[index];
 
     // Reset UI state
-    const modeTag = this.gameMode === 'daily' ? 'DAGENS' : 'ØVING';
-    this.elements.roundDisplay.textContent = `${modeTag} • Runde ${index + 1} / ${this.totalRounds}`;
+    this.elements.roundDisplay.textContent = `${index + 1}/${this.totalRounds}`;
     this.elements.btnGuess.disabled = true;
     this.elements.btnGuess.classList.remove('ready');
 

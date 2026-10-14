@@ -132,6 +132,9 @@ html, body {
 
 /* Game Status HUD */
 .hud-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -217,13 +220,9 @@ html, body {
   width: 100vw;
   height: 100vh;
   z-index: 10;
-  cursor: grab;
+  cursor: default;
   background-color: #030712;
   overflow: hidden;
-}
-
-.viewport-container.grabbing {
-  cursor: grabbing;
 }
 
 .panorama-img {
