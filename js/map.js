@@ -164,6 +164,11 @@ class GameMap {
     if (this.targetMarker) this.map.removeLayer(this.targetMarker);
     if (this.connectionLine) this.map.removeLayer(this.connectionLine);
 
+    // Lock guess marker from being dragged while panning the map
+    if (this.guessMarker && this.guessMarker.dragging) {
+      this.guessMarker.dragging.disable();
+    }
+
     // Place Target Marker
     this.targetMarker = L.marker(targetCoords, {
       icon: this.createPinIcon('target')
@@ -174,24 +179,29 @@ class GameMap {
     // Draw connection line
     if (guessCoords) {
       this.connectionLine = L.polyline([guessCoords, targetCoords], {
-        color: '#FFB703',
-        weight: 4,
-        dashArray: '8, 8',
+        color: '#F59E0B',
+        weight: 3.5,
+        dashArray: '6, 6',
         lineCap: 'round',
         opacity: 0.95
       }).addTo(this.map);
 
-      // Fit both points in view
+      // Fit both points in view, offsetting so bottom-right infobox does not obscure pins
       const bounds = L.latLngBounds([guessCoords, targetCoords]);
+      const isMobile = window.innerWidth <= 600;
+      const padBottomRight = isMobile ? [40, 260] : [420, 60];
+      const padTopLeft = isMobile ? [40, 40] : [60, 60];
+
       this.map.fitBounds(bounds, {
-        padding: [60, 60],
+        paddingBottomRight: padBottomRight,
+        paddingTopLeft: padTopLeft,
         maxZoom: 17,
         animate: true,
-        duration: 1.0
+        duration: 0.9
       });
     } else {
       // If timed out without guess
-      this.map.flyTo(targetCoords, 17, { duration: 1.0 });
+      this.map.flyTo(targetCoords, 17, { duration: 0.9 });
     }
   }
 

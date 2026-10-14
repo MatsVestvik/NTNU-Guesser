@@ -453,8 +453,8 @@ html, body {
   transform-origin: bottom right;
 }
 
-/* Expand on Hover unless disabled */
-.map-widget-container:not(.pinned-large):hover {
+/* Expand on Hover unless pinned or expanded */
+.map-widget-container:not(.pinned-large):not(.result-expanded):hover {
   width: 480px;
   height: 380px;
 }
@@ -465,23 +465,29 @@ html, body {
   height: 520px;
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 120px);
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-glow), var(--shadow-lg);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
 }
 
 /* Result Expanded State for Map during round reveal */
 .map-widget-container.result-expanded {
   position: absolute;
-  top: 90px;
+  top: 80px;
   left: 20px;
   right: 20px;
   bottom: 20px;
   width: auto !important;
   height: auto !important;
   z-index: 120;
-  border-color: var(--border-glow);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.85);
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: auto !important;
+}
+
+.map-widget-container.result-expanded .guess-map-canvas {
+  height: calc(100% - 42px) !important;
+  pointer-events: auto !important;
 }
 
 .map-widget-container.result-expanded .map-footer {
@@ -857,32 +863,51 @@ html, body {
 }
 
 /* ==========================================================================
-   ROUND RESULT MODAL
+   ROUND RESULT INFOBOX (BOTTOM RIGHT, MAP FULLY MOVABLE & INTERACTIVE)
    ========================================================================== */
 
 #round-result-modal {
-  background: rgba(3, 7, 18, 0.4);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   z-index: 180;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding-bottom: 24px;
+  display: block !important;
+  pointer-events: none !important; /* CRITICAL: Allows clicks and drags to pass directly to the map! */
+  opacity: 1;
+  transition: opacity 0.25s ease;
+  padding: 0;
+}
+
+#round-result-modal.hidden {
+  opacity: 0;
+  pointer-events: none !important;
+  display: none !important;
 }
 
 #round-result-modal .modal-card {
-  max-width: 620px;
-  background: rgba(13, 21, 39, 0.95);
-  backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(0, 112, 243, 0.35);
-  animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 24px;
+  position: absolute;
+  bottom: 32px;
+  right: 32px;
+  width: 380px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 120px);
+  background: #0F172A;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+  animation: slideInResultCard 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 20px;
+  pointer-events: auto !important; /* CRITICAL: Infobox itself and buttons remain clickable! */
+  overflow-y: auto;
 }
 
-@keyframes slideUpModal {
-  from { transform: translateY(50px) scale(0.96); opacity: 0; }
+@keyframes slideInResultCard {
+  from { transform: translateY(40px) scale(0.96); opacity: 0; }
   to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
@@ -890,34 +915,34 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px;
-  background: rgba(0, 112, 243, 0.1);
-  border: 1px solid rgba(0, 112, 243, 0.25);
+  padding: 12px 16px;
+  background: rgba(0, 80, 158, 0.18);
+  border: 1px solid rgba(0, 102, 204, 0.3);
   border-radius: var(--radius-md);
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .result-distance {
   font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 700;
   color: #fff;
 }
 
 .result-points {
   font-family: var(--font-mono);
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 800;
   color: var(--accent-gold);
 }
 
 .result-badge {
   display: inline-block;
-  padding: 6px 14px;
+  padding: 4px 12px;
   border-radius: var(--radius-full);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .result-badge.perfect {
@@ -927,35 +952,37 @@ html, body {
 }
 
 .result-badge.high {
-  background: rgba(56, 189, 248, 0.2);
+  background: rgba(56, 189, 248, 0.18);
   border: 1px solid var(--ntnu-cyan);
   color: var(--ntnu-cyan);
 }
 
 .result-badge.medium {
-  background: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.18);
   border: 1px solid var(--accent-gold);
   color: var(--accent-gold);
 }
 
 .result-badge.low {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.18);
   border: 1px solid var(--accent-red);
   color: var(--accent-red);
 }
 
 .result-badge.fail {
-  background: rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.18);
   border: 1px solid var(--text-secondary);
   color: var(--text-secondary);
 }
 
 .lore-card {
-  background: var(--bg-glass-light);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border-glass);
   border-radius: var(--radius-md);
-  padding: 18px;
-  margin-bottom: 24px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  max-height: 120px;
+  overflow-y: auto;
 }
 
 .lore-card-header {
@@ -1153,6 +1180,23 @@ html, body {
 
   .modal-card {
     padding: 20px;
+  }
+
+  .map-widget-container.result-expanded {
+    top: 70px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+  }
+
+  #round-result-modal .modal-card {
+    bottom: 14px;
+    right: 14px;
+    left: 14px;
+    width: auto;
+    max-width: none;
+    max-height: 45vh;
+    padding: 14px;
   }
 
   .game-over-actions {
