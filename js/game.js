@@ -1,7 +1,6 @@
 /**
- * NTNU Guesser - Main Game Controller (Daily Challenge & Shared Leaderboard Edition)
- * Handles deterministic daily seeding, player name management, scoring, timers,
- * REST API communication with server.py, confetti, and leaderboard modal.
+ * NTNU Guesser - Main Game Controller
+ * Simplified Flow: Enter Name (Start button disabled until valid) -> 5 Daily Locations -> Normal Distribution Curve & Leaderboard Placement.
  */
 
 // ==========================================
@@ -37,6 +36,193 @@ function getDailyLocations(dateStr, count = 5) {
   return pool.slice(0, count);
 }
 
+// Gaussian CDF approximation (Abramowitz & Stegun formula)
+function normalCDF(score, mean = 16500, std = 4000) {
+  const z = (score - mean) / (std * Math.SQRT2);
+  const a1 =  0.254829592;
+  const a2 = -0.284496736;
+  const a3 =  1.421413741;
+  const a4 = -1.453152027;
+  const a5 =  1.061405429;
+  const p  =  0.3275911;
+
+  const sign = z >= 0 ? 1 : -1;
+  const absZ = Math.abs(z);
+  const t = 1.0 / (1.0 + p * absZ);
+  const erf = sign * (1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-absZ * absZ));
+  return 0.5 * (1.0 + erf);
+}
+
+// ==========================================
+// Bell Curve (Normalfordelt Kurve) Canvas Renderer
+// ==========================================
+function drawBellCurve(canvas, playerScore, percentile, allScores = []) {
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+
+  const w = rect.width > 50 ? rect.width : 640;
+  const h = rect.height > 50 ? rect.height : 200;
+
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  ctx.scale(dpr, dpr);
+
+  ctx.clearRect(0, 0, w, h);
+
+  const paddingLeft = 45;
+  const paddingRight = 45;
+  const paddingTop = 35;
+  const paddingBottom = 35;
+
+  const plotW = w - paddingLeft - paddingRight;
+  const plotH = h - paddingTop - paddingBottom;
+
+  const minScore = 0;
+  const maxScore = 25000;
+  const mean = 16500;
+  const std = 4000;
+
+  function gaussian(x) {
+    const z = (x - mean) / std;
+    return Math.exp(-0.5 * z * z);
+  }
+
+  const clampedScore = Math.max(0, Math.min(maxScore, playerScore));
+  const playerX = paddingLeft + (clampedScore / maxScore) * plotW;
+  const playerYVal = gaussian(clampedScore);
+  const playerCanvasY = paddingTop + plotH - (playerYVal * (plotH * 0.88));
+
+  // 1. Background Curve fill (subtle dark slate)
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, paddingTop + plotH);
+  for (let x = 0; x <= plotW; x += 3) {
+    const scoreVal = minScore + (x / plotW) * maxScore;
+    const yVal = gaussian(scoreVal);
+    const canvasY = paddingTop + plotH - (yVal * (plotH * 0.88));
+    ctx.lineTo(paddingLeft + x, canvasY);
+  }
+  ctx.lineTo(paddingLeft + plotW, paddingTop + plotH);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+  ctx.fill();
+
+  // 2. Highlighted area under curve from 0 up to Player's Score
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, playerX, h);
+  ctx.clip();
+
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, paddingTop + plotH);
+  for (let x = 0; x <= plotW; x += 3) {
+    const scoreVal = minScore + (x / plotW) * maxScore;
+    const yVal = gaussian(scoreVal);
+    const canvasY = paddingTop + plotH - (yVal * (plotH * 0.88));
+    ctx.lineTo(paddingLeft + x, canvasY);
+  }
+  ctx.lineTo(paddingLeft + plotW, paddingTop + plotH);
+  ctx.closePath();
+
+  const fillGradient = ctx.createLinearGradient(paddingLeft, 0, playerX, 0);
+  fillGradient.addColorStop(0, 'rgba(0, 112, 243, 0.2)');
+  fillGradient.addColorStop(1, 'rgba(56, 189, 248, 0.55)');
+  ctx.fillStyle = fillGradient;
+  ctx.fill();
+  ctx.restore();
+
+  // 3. Crisp Glowing Curve Outline
+  ctx.beginPath();
+  for (let x = 0; x <= plotW; x += 3) {
+    const scoreVal = minScore + (x / plotW) * maxScore;
+    const yVal = gaussian(scoreVal);
+    const canvasY = paddingTop + plotH - (yVal * (plotH * 0.88));
+    if (x === 0) ctx.moveTo(paddingLeft + x, canvasY);
+    else ctx.lineTo(paddingLeft + x, canvasY);
+  }
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = '#38BDF8';
+  ctx.shadowColor = 'rgba(56, 189, 248, 0.6)';
+  ctx.shadowBlur = 10;
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // 4. Baseline
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, paddingTop + plotH);
+  ctx.lineTo(paddingLeft + plotW, paddingTop + plotH);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  // 5. Vertical Dashed Marker Line at Player Score
+  ctx.beginPath();
+  ctx.setLineDash([4, 4]);
+  ctx.moveTo(playerX, paddingTop + plotH);
+  ctx.lineTo(playerX, playerCanvasY);
+  ctx.strokeStyle = '#F59E0B';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 6. Glowing Marker Dot at Curve Peak for this Score
+  ctx.beginPath();
+  ctx.arc(playerX, playerCanvasY, 6.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#F59E0B';
+  ctx.shadowColor = '#F59E0B';
+  ctx.shadowBlur = 14;
+  ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = '#FFFFFF';
+  ctx.lineWidth = 2.5;
+  ctx.stroke();
+
+  // 7. Floating Pin Badge above Marker
+  const tagText = `DEG: ${playerScore.toLocaleString('no-NO')} p`;
+  ctx.font = 'bold 12px "JetBrains Mono", monospace';
+  const tagW = ctx.measureText(tagText).width + 18;
+  const tagH = 26;
+  const tagX = Math.max(paddingLeft, Math.min(w - paddingRight - tagW, playerX - tagW / 2));
+  const tagY = Math.max(6, playerCanvasY - 36);
+
+  ctx.fillStyle = 'rgba(13, 21, 39, 0.95)';
+  ctx.strokeStyle = '#F59E0B';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  ctx.roundRect(tagX, tagY, tagW, tagH, 6);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(tagText, tagX + tagW / 2, tagY + tagH / 2);
+
+  // 8. Axis Labels
+  ctx.font = '11px "Plus Jakarta Sans", sans-serif';
+  ctx.fillStyle = '#94A3B8';
+  ctx.textBaseline = 'top';
+
+  const axisPoints = [
+    { label: '0 p', frac: 0, align: 'left' },
+    { label: '5k', frac: 5000 / 25000, align: 'center' },
+    { label: '10k', frac: 10000 / 25000, align: 'center' },
+    { label: '16.5k (Snitt)', frac: 16500 / 25000, align: 'center' },
+    { label: '20k', frac: 20000 / 25000, align: 'center' },
+    { label: '25k p', frac: 1, align: 'right' }
+  ];
+
+  axisPoints.forEach(pt => {
+    ctx.textAlign = pt.align;
+    const axX = paddingLeft + pt.frac * plotW;
+    ctx.fillText(pt.label, axX, paddingTop + plotH + 8);
+  });
+}
+
+// ==========================================
+// NTNUGuesserGame Main Class
+// ==========================================
 class NTNUGuesserGame {
   constructor() {
     this.totalRounds = 5;
@@ -52,13 +238,9 @@ class NTNUGuesserGame {
     this.dayNumber = 1;
     this.secondsUntilMidnight = 0;
     this.playerName = localStorage.getItem('ntnu_player_name') || '';
-    this.activeLeaderboardTab = 'daily';
-
-    // Timer config
-    this.timerDuration = 0; // 0 = unlimited
-    this.timerRemaining = 0;
-    this.timerInterval = null;
-    this.countdownInterval = null;
+    this.percentile = 50;
+    this.rank = 1;
+    this.allScores = [];
 
     // UI elements
     this.elements = {};
@@ -83,11 +265,8 @@ class NTNUGuesserGame {
       scoreDisplay: document.getElementById('score-display'),
       playerHudPill: document.getElementById('player-hud-pill'),
       playerHudName: document.getElementById('player-hud-name'),
-      timerDisplay: document.getElementById('timer-display'),
-      timerBadge: document.getElementById('timer-badge'),
       headerLeaderboardBtn: document.getElementById('header-leaderboard-btn'),
       muteBtn: document.getElementById('mute-btn'),
-      settingsBtn: document.getElementById('settings-btn'),
       helpBtn: document.getElementById('help-btn'),
 
       // Controls
@@ -106,18 +285,11 @@ class NTNUGuesserGame {
       btnGuess: document.getElementById('btn-guess'),
       campusPillsContainer: document.getElementById('campus-pills'),
 
-      // Welcome / Start Modal
+      // Simplified Start Modal
       startModal: document.getElementById('start-modal'),
       playerDisplaynameInput: document.getElementById('player-displayname'),
-      nameValidationError: document.getElementById('name-validation-error'),
-      dailyBadgePill: document.getElementById('daily-badge-pill'),
-      dailyStatusBox: document.getElementById('daily-status-box'),
-      dailyChallengeTitle: document.getElementById('daily-challenge-title'),
-      dailyCountdownText: document.getElementById('daily-countdown-text'),
       btnStartGame: document.getElementById('btn-start-game'),
-      btnStartPractice: document.getElementById('btn-start-practice'),
       btnViewLeaderboardModal: document.getElementById('btn-view-leaderboard-modal'),
-      miniLeaderboardList: document.getElementById('mini-leaderboard-list'),
 
       // Dedicated Leaderboard Modal
       leaderboardModal: document.getElementById('leaderboard-modal'),
@@ -129,7 +301,7 @@ class NTNUGuesserGame {
       clockCountdown: document.getElementById('clock-countdown'),
       btnPlayFromLeaderboard: document.getElementById('btn-play-from-leaderboard'),
 
-      // Round Result elements
+      // Round Result Modal
       roundResultModal: document.getElementById('round-result-modal'),
       resultDistance: document.getElementById('result-distance'),
       resultPoints: document.getElementById('result-points'),
@@ -139,23 +311,24 @@ class NTNUGuesserGame {
       resultLore: document.getElementById('result-lore'),
       btnNextRound: document.getElementById('btn-next-round'),
 
-      // Game Over elements
+      // Game Over: Bell Curve & Leaderboard
       gameOverModal: document.getElementById('game-over-modal'),
       finalScore: document.getElementById('final-score'),
       finalRankTitle: document.getElementById('final-rank-title'),
       finalRankDesc: document.getElementById('final-rank-desc'),
-      leaderboardPlacementBanner: document.getElementById('leaderboard-placement-banner'),
-      placementIcon: document.getElementById('placement-icon'),
-      placementText: document.getElementById('placement-text'),
-      tabGameoverRecap: document.getElementById('tab-gameover-recap'),
+      percentileValue: document.getElementById('percentile-value'),
+      percentileSubtext: document.getElementById('percentile-subtext'),
+      rankValue: document.getElementById('rank-value'),
+      bellCurveCanvas: document.getElementById('bell-curve-canvas'),
       tabGameoverLeaderboard: document.getElementById('tab-gameover-leaderboard'),
-      gameoverRecapSection: document.getElementById('gameover-recap-section'),
+      tabGameoverRecap: document.getElementById('tab-gameover-recap'),
       gameoverLeaderboardSection: document.getElementById('gameover-leaderboard-section'),
+      gameoverRecapSection: document.getElementById('gameover-recap-section'),
       gameoverLeaderboardBody: document.getElementById('gameover-leaderboard-body'),
       recapTableBody: document.getElementById('recap-table-body'),
-      btnPlayAgain: document.getElementById('btn-play-again'),
       btnShareScore: document.getElementById('btn-share-score'),
       btnExploreRecapMap: document.getElementById('btn-explore-recap-map'),
+      btnPlayAgain: document.getElementById('btn-play-again'),
       btnBackToSummary: document.getElementById('btn-back-to-summary'),
       shareFeedback: document.getElementById('share-feedback'),
 
@@ -166,10 +339,13 @@ class NTNUGuesserGame {
   }
 
   async initDailyGame() {
-    // Populate saved player name
-    if (this.playerName && this.elements.playerDisplaynameInput) {
-      this.elements.playerDisplaynameInput.value = this.playerName;
-      this.updatePlayerHudName();
+    // Check saved name and set input
+    if (this.elements.playerDisplaynameInput) {
+      if (this.playerName) {
+        this.elements.playerDisplaynameInput.value = this.playerName;
+        this.updateStartButtonState();
+        this.updatePlayerHudName();
+      }
     }
 
     // Fetch daily info from backend
@@ -185,27 +361,16 @@ class NTNUGuesserGame {
       console.warn("Could not fetch /api/daily, using local time:", e);
     }
 
-    // Format human readable date for NTNU students (f.eks. "14. OKTOBER 2026")
     const dateObj = new Date(this.todayDate);
     const dateFormatted = dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'long' });
     if (this.elements.dailyDateSubtitle) {
       this.elements.dailyDateSubtitle.textContent = `DAGENS UTFORDRING #${this.dayNumber} • ${dateFormatted.toUpperCase()}`;
     }
-    if (this.elements.dailyBadgePill) {
-      this.elements.dailyBadgePill.textContent = `📅 DAGENS UTFORDRING #${this.dayNumber} • ${dateFormatted}`;
-    }
     if (this.elements.tabDateLabel) {
       this.elements.tabDateLabel.textContent = dateFormatted;
     }
 
-    // Start live countdown to midnight
     this.startMidnightCountdown();
-
-    // Check if player has already played today's daily challenge
-    this.checkDailyPlayedStatus();
-
-    // Fetch and populate mini-leaderboard preview
-    this.loadLeaderboardPreview();
   }
 
   updatePlayerHudName() {
@@ -214,9 +379,23 @@ class NTNUGuesserGame {
     }
   }
 
+  updateStartButtonState() {
+    const input = this.elements.playerDisplaynameInput;
+    const btn = this.elements.btnStartGame;
+    if (!input || !btn) return;
+
+    const val = input.value.trim();
+    if (val.length >= 2) {
+      btn.disabled = false;
+      btn.classList.add('ready');
+    } else {
+      btn.disabled = true;
+      btn.classList.remove('ready');
+    }
+  }
+
   startMidnightCountdown() {
-    clearInterval(this.countdownInterval);
-    const update = () => {
+    setInterval(() => {
       if (this.secondsUntilMidnight > 0) {
         this.secondsUntilMidnight--;
         const h = Math.floor(this.secondsUntilMidnight / 3600);
@@ -226,194 +405,48 @@ class NTNUGuesserGame {
         if (this.elements.clockCountdown) {
           this.elements.clockCountdown.textContent = str;
         }
-        if (this.elements.dailyCountdownText) {
-          this.elements.dailyCountdownText.textContent = `Neste utfordring slippes om ${str}`;
-        }
       }
-    };
-    update();
-    this.countdownInterval = setInterval(update, 1000);
-  }
-
-  checkDailyPlayedStatus() {
-    const key = `ntnu_daily_done_${this.todayDate}`;
-    const saved = localStorage.getItem(key);
-
-    if (saved && this.elements.dailyStatusBox) {
-      try {
-        const parsed = JSON.parse(saved);
-        this.elements.dailyChallengeTitle.innerHTML = `🎉 Du har fullført dagens utfordring! Score: <strong>${parsed.score.toLocaleString('no-NO')} poeng</strong>`;
-        if (parsed.rank) {
-          this.elements.dailyChallengeTitle.innerHTML += ` (Plassering: #${parsed.rank})`;
-        }
-        this.elements.btnStartGame.textContent = "Start Dagens Utfordring Igjen 🚀";
-      } catch (e) {}
-    }
-  }
-
-  validatePlayerName() {
-    const input = this.elements.playerDisplaynameInput;
-    if (!input) return false;
-    const name = input.value.trim();
-
-    if (name.length < 2) {
-      if (this.elements.nameValidationError) {
-        this.elements.nameValidationError.classList.remove('hidden');
-      }
-      input.focus();
-      return false;
-    }
-
-    if (this.elements.nameValidationError) {
-      this.elements.nameValidationError.classList.add('hidden');
-    }
-
-    this.playerName = name;
-    localStorage.setItem('ntnu_player_name', name);
-    this.updatePlayerHudName();
-    return true;
-  }
-
-  async loadLeaderboardPreview() {
-    if (!this.elements.miniLeaderboardList) return;
-    try {
-      const resp = await fetch(`/api/leaderboard?type=daily&date=${this.todayDate}`);
-      if (resp.ok) {
-        const data = await resp.json();
-        this.renderMiniLeaderboard(data.entries || []);
-      }
-    } catch (e) {
-      console.warn("Could not load preview leaderboard:", e);
-    }
-  }
-
-  renderMiniLeaderboard(entries) {
-    const container = this.elements.miniLeaderboardList;
-    if (!container) return;
-
-    if (!entries || entries.length === 0) {
-      container.innerHTML = `<div style="text-align: center; color: #94A3B8; padding: 8px; font-size: 0.85rem;">Ingen har spilt dagens utfordring ennå. Bli den første! 🚀</div>`;
-      return;
-    }
-
-    container.innerHTML = '';
-    const medals = ['🥇', '🥈', '🥉'];
-    entries.slice(0, 5).forEach((entry, idx) => {
-      const row = document.createElement('div');
-      const isUser = this.playerName && entry.name.toLowerCase() === this.playerName.toLowerCase();
-      row.className = `mini-row ${isUser ? 'user-highlight' : ''}`;
-      row.innerHTML = `
-        <span class="mini-rank">${medals[idx] || (idx + 1) + '.'}</span>
-        <span class="mini-name">${this.escapeHtml(entry.name)} ${isUser ? '<span class="user-badge">DEG</span>' : ''}</span>
-        <span class="mini-score">${entry.score.toLocaleString('no-NO')}</span>
-      `;
-      container.appendChild(row);
-    });
-  }
-
-  async openLeaderboardModal(tab = 'daily') {
-    this.activeLeaderboardTab = tab;
-    this.updateLeaderboardTabStyles();
-    this.elements.leaderboardModal.classList.remove('hidden');
-    await this.fetchAndRenderLeaderboard(tab);
-  }
-
-  updateLeaderboardTabStyles() {
-    if (this.activeLeaderboardTab === 'daily') {
-      this.elements.tabDailyLeaderboard.classList.add('active');
-      this.elements.tabAlltimeLeaderboard.classList.remove('active');
-    } else {
-      this.elements.tabDailyLeaderboard.classList.remove('active');
-      this.elements.tabAlltimeLeaderboard.classList.add('active');
-    }
-  }
-
-  async fetchAndRenderLeaderboard(type = 'daily', targetTbody = null) {
-    const tbody = targetTbody || this.elements.leaderboardTableBody;
-    if (!tbody) return;
-
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94A3B8;">Laster toppliste...</td></tr>`;
-
-    try {
-      const url = `/api/leaderboard?type=${type}&date=${this.todayDate}`;
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error("HTTP error " + resp.status);
-      const data = await resp.json();
-      this.populateLeaderboardTable(data.entries || [], tbody);
-    } catch (e) {
-      console.warn("Failed fetching leaderboard:", e);
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #EF4444;">Kunne ikke laste topplisten akkurat nå.</td></tr>`;
-    }
-  }
-
-  populateLeaderboardTable(entries, tbody) {
-    if (!tbody) return;
-    if (!entries || entries.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 24px; color: #94A3B8;">Ingen resultater registrert ennå.</td></tr>`;
-      return;
-    }
-
-    tbody.innerHTML = '';
-    const medals = ['🥇', '🥈', '🥉'];
-
-    entries.forEach((r, idx) => {
-      const tr = document.createElement('tr');
-      const isUser = this.playerName && r.name.toLowerCase() === this.playerName.toLowerCase();
-      if (isUser) tr.classList.add('user-row');
-
-      const rankBadge = medals[idx] ? `<span class="medal-icon">${medals[idx]}</span>` : `${idx + 1}.`;
-      const distStr = r.totalDistance < 1000 ? `${Math.round(r.totalDistance)} m` : `${(r.totalDistance / 1000).toFixed(1)} km`;
-      
-      let timeStr = "";
-      if (r.created_at) {
-        const parts = r.created_at.split(' ');
-        timeStr = parts[1] ? parts[1].slice(0, 5) : "";
-      }
-
-      tr.innerHTML = `
-        <td style="font-weight: 800; text-align: center;">${rankBadge}</td>
-        <td><strong>${this.escapeHtml(r.name)}</strong>${isUser ? ' <span class="user-badge">DEG</span>' : ''}</td>
-        <td><span class="score-pill">${r.score.toLocaleString('no-NO')}</span></td>
-        <td style="color: #94A3B8;">${distStr}</td>
-        <td style="color: #64748B; font-size: 0.8rem;">${timeStr}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+    }, 1000);
   }
 
   bindEvents() {
-    // Display name input change
+    // Name input: strictly enables/disables the start button!
     if (this.elements.playerDisplaynameInput) {
       this.elements.playerDisplaynameInput.addEventListener('input', (e) => {
         this.playerName = e.target.value.trim();
-        localStorage.setItem('ntnu_player_name', this.playerName);
-        this.updatePlayerHudName();
+        this.updateStartButtonState();
+        if (this.playerName.length >= 2) {
+          localStorage.setItem('ntnu_player_name', this.playerName);
+          this.updatePlayerHudName();
+        }
+      });
+
+      // Pressing Enter starts the game if valid
+      this.elements.playerDisplaynameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && this.elements.btnStartGame && !this.elements.btnStartGame.disabled) {
+          e.preventDefault();
+          this.elements.btnStartGame.click();
+        }
       });
     }
 
-    // Start Daily Challenge
+    // Start Button Click: Starts directly on the 5 daily locations!
     if (this.elements.btnStartGame) {
       this.elements.btnStartGame.addEventListener('click', () => {
-        if (!this.validatePlayerName()) return;
+        const name = this.elements.playerDisplaynameInput.value.trim();
+        if (name.length < 2) return;
+
+        this.playerName = name;
+        localStorage.setItem('ntnu_player_name', name);
+        this.updatePlayerHudName();
+
         soundManager.playClick();
-        this.gameMode = 'daily';
         this.elements.startModal.classList.add('hidden');
         this.startNewGame();
       });
     }
 
-    // Start Practice Mode
-    if (this.elements.btnStartPractice) {
-      this.elements.btnStartPractice.addEventListener('click', () => {
-        if (!this.validatePlayerName()) return;
-        soundManager.playClick();
-        this.gameMode = 'practice';
-        this.elements.startModal.classList.add('hidden');
-        this.startNewGame();
-      });
-    }
-
-    // Open Leaderboard Modal buttons
+    // Open Leaderboard Modal from Header or Start Modal
     const openLeaderboard = () => {
       soundManager.playClick();
       this.openLeaderboardModal('daily');
@@ -432,8 +465,6 @@ class NTNUGuesserGame {
         this.elements.leaderboardModal.classList.add('hidden');
       });
     }
-
-    // Play from Leaderboard Modal
     if (this.elements.btnPlayFromLeaderboard) {
       this.elements.btnPlayFromLeaderboard.addEventListener('click', () => {
         soundManager.playClick();
@@ -444,7 +475,7 @@ class NTNUGuesserGame {
       });
     }
 
-    // Leaderboard Tabs
+    // Leaderboard Tabs in Modal
     if (this.elements.tabDailyLeaderboard) {
       this.elements.tabDailyLeaderboard.addEventListener('click', () => {
         soundManager.playClick();
@@ -458,7 +489,16 @@ class NTNUGuesserGame {
       });
     }
 
-    // Game Over Tabs: Recap vs Live Leaderboard
+    // Game Over Tabs: Live Leaderboard vs Rounds Recap
+    if (this.elements.tabGameoverLeaderboard) {
+      this.elements.tabGameoverLeaderboard.addEventListener('click', () => {
+        soundManager.playClick();
+        this.elements.tabGameoverLeaderboard.classList.add('active');
+        this.elements.tabGameoverRecap.classList.remove('active');
+        this.elements.gameoverLeaderboardSection.classList.remove('hidden');
+        this.elements.gameoverRecapSection.classList.add('hidden');
+      });
+    }
     if (this.elements.tabGameoverRecap) {
       this.elements.tabGameoverRecap.addEventListener('click', () => {
         soundManager.playClick();
@@ -466,16 +506,6 @@ class NTNUGuesserGame {
         this.elements.tabGameoverLeaderboard.classList.remove('active');
         this.elements.gameoverRecapSection.classList.remove('hidden');
         this.elements.gameoverLeaderboardSection.classList.add('hidden');
-      });
-    }
-    if (this.elements.tabGameoverLeaderboard) {
-      this.elements.tabGameoverLeaderboard.addEventListener('click', () => {
-        soundManager.playClick();
-        this.elements.tabGameoverRecap.classList.remove('active');
-        this.elements.tabGameoverLeaderboard.classList.add('active');
-        this.elements.gameoverRecapSection.classList.add('hidden');
-        this.elements.gameoverLeaderboardSection.classList.remove('hidden');
-        this.fetchAndRenderLeaderboard('daily', this.elements.gameoverLeaderboardBody);
       });
     }
 
@@ -492,7 +522,7 @@ class NTNUGuesserGame {
       });
     }
 
-    // Back to summary from recap map
+    // Back to summary from map exploration
     if (this.elements.btnBackToSummary) {
       this.elements.btnBackToSummary.addEventListener('click', () => {
         soundManager.playClick();
@@ -534,7 +564,8 @@ class NTNUGuesserGame {
       this.elements.btnPlayAgain.addEventListener('click', () => {
         soundManager.playClick();
         this.elements.gameOverModal.classList.add('hidden');
-        this.elements.startModal.classList.remove('hidden');
+        this.gameMode = 'practice';
+        this.startNewGame();
       });
     }
 
@@ -552,14 +583,6 @@ class NTNUGuesserGame {
         this.updateMuteIcon(isMuted);
       });
       this.updateMuteIcon(soundManager.isMuted());
-    }
-
-    // Settings modal reopen
-    if (this.elements.settingsBtn) {
-      this.elements.settingsBtn.addEventListener('click', () => {
-        soundManager.playClick();
-        this.elements.startModal.classList.remove('hidden');
-      });
     }
 
     // Help modal toggle
@@ -618,7 +641,7 @@ class NTNUGuesserGame {
       });
     }
 
-    // Map size toggle (Pin/Unpin expansion)
+    // Map size toggle
     if (this.elements.btnToggleMapSize) {
       this.elements.btnToggleMapSize.addEventListener('click', () => {
         soundManager.playClick();
@@ -627,18 +650,16 @@ class NTNUGuesserGame {
       });
     }
 
-    // Map layer toggle (Satellite / Street)
+    // Map layer toggle
     if (this.elements.btnToggleLayer) {
       this.elements.btnToggleLayer.addEventListener('click', () => {
         soundManager.playClick();
-        const mode = this.gameMap.toggleLayer();
-        this.elements.btnToggleLayer.title = mode === 'satellite' ? 'Bytt til gatekart' : 'Bytt til satellitt';
+        this.gameMap.toggleLayer();
       });
     }
 
     // Keyboard shortcuts: Space to guess, Enter/Space for next round, Esc to unpin map
     window.addEventListener('keydown', (e) => {
-      // If round result modal is open, advance on Enter or Space
       if (this.elements.roundResultModal && !this.elements.roundResultModal.classList.contains('hidden')) {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
@@ -657,6 +678,13 @@ class NTNUGuesserGame {
         }
         if (this.elements.hintBox) this.elements.hintBox.classList.add('hidden');
         if (this.elements.leaderboardModal) this.elements.leaderboardModal.classList.add('hidden');
+      }
+    });
+
+    // Window resize redraws bell curve
+    window.addEventListener('resize', () => {
+      if (!this.elements.gameOverModal.classList.contains('hidden')) {
+        drawBellCurve(this.elements.bellCurveCanvas, this.totalScore, this.percentile, this.allScores);
       }
     });
   }
@@ -798,7 +826,7 @@ class NTNUGuesserGame {
 
   showRoundResultModal(data) {
     const isLastRound = this.currentRoundIndex + 1 >= this.totalRounds;
-    this.elements.btnNextRound.textContent = isLastRound ? "Se sluttresultat & Leaderboard 🏆" : "Neste runde ➔";
+    this.elements.btnNextRound.textContent = isLastRound ? "Se Sluttresultat & Kurve 📈" : "Neste runde ➔";
 
     const distFormatted = data.distance < 1000
       ? `${Math.round(data.distance)} meter`
@@ -837,7 +865,6 @@ class NTNUGuesserGame {
     this.elements.resultCampusName.textContent = `Campus ${data.target.campus}`;
     this.elements.resultLore.textContent = data.target.lore;
 
-    // Show modal
     setTimeout(() => {
       this.elements.roundResultModal.classList.remove('hidden');
     }, 600);
@@ -881,26 +908,26 @@ class NTNUGuesserGame {
     this.elements.finalScore.textContent = `${this.totalScore.toLocaleString('no-NO')} / 25 000`;
 
     // Calculate degree rank
-    let rank = "";
+    let rankTitle = "";
     let desc = "";
     if (this.totalScore >= 24000) {
-      rank = "Sivilingeniør i NTNU-geografi 🎓👑";
-      desc = "Eksepsjonell innsats! Du kjenner hver eneste brostein, trappegang og auditorium bedre enn rektor selv!";
+      rankTitle = "Sivilingeniør i NTNU-geografi 🎓👑";
+      desc = "Eksepsjonell innsats! Du kjenner hver eneste brostein og auditorium på campus bedre enn rektor!";
     } else if (this.totalScore >= 20000) {
-      rank = "Mastergrad i Stripa & Samfundet-Høvding 🌟";
+      rankTitle = "Mastergrad i Stripa & Samfundet-Høvding 🌟";
       desc = "Imponerende lokalkunnskap! Du navigerer Trondheim på autopilot, selv etter en lang kveld på Bodegaen.";
     } else if (this.totalScore >= 15000) {
-      rank = "Bachelorgrad i Campus-Orientering 🗺️";
-      desc = "Godt levert! Du finner veien til de fleste forelesninger, men har kanskje unngått krikene og krokene på Tyholt.";
+      rankTitle = "Bachelorgrad i Campus-Orientering 🗺️";
+      desc = "Godt levert! Du finner veien til de fleste forelesninger, men har kanskje unngått krikene på Tyholt.";
     } else if (this.totalScore >= 10000) {
-      rank = "Forvillet Førsteklassing på jakt etter R1 🎒";
+      rankTitle = "Forvillet Førsteklassing på jakt etter R1 🎒";
       desc = "Helt greit, men du har nok virret en del rundt i Sentralbygg og lurt på hvor heisen ender.";
     } else {
-      rank = "Tok linje 3 til feil ende av byen 🚌💨";
+      rankTitle = "Tok linje 3 til feil ende av byen 🚌💨";
       desc = "Du endte visst opp på feil campus... Anbefaler en guidet tur langs Høgskoleringen og et vaffelhjerte på Stripa!";
     }
 
-    this.elements.finalRankTitle.textContent = rank;
+    this.elements.finalRankTitle.textContent = rankTitle;
     this.elements.finalRankDesc.textContent = desc;
 
     // Calculate total distance
@@ -925,33 +952,26 @@ class NTNUGuesserGame {
     // Prepare All on Recap Map
     this.gameMap.showAllRecap(this.roundsData);
 
-    // Submit score to Leaderboard API if daily mode
-    if (this.gameMode === 'daily') {
-      await this.submitDailyScore(this.playerName, this.totalScore, totalDist);
-    } else {
-      if (this.elements.leaderboardPlacementBanner) {
-        this.elements.placementIcon.textContent = "🎯";
-        this.elements.placementText.textContent = "Øvingsmodus fullført! (Scores fra øving registreres ikke på daily leaderboard)";
-      }
-    }
+    // Default theoretical percentile from Gaussian CDF
+    let computedPercentile = Math.round(normalCDF(this.totalScore) * 100);
+    computedPercentile = Math.max(1, Math.min(99, computedPercentile));
+    this.percentile = computedPercentile;
+    this.rank = 1;
 
-    this.elements.gameOverModal.classList.remove('hidden');
-  }
-
-  async submitDailyScore(name, score, totalDistance) {
-    const payload = {
-      name: name || "Anonym Gløsing",
-      score: score,
-      totalDistance: totalDistance,
-      date: this.todayDate,
-      rounds: this.roundsData.map(r => ({
-        target: r.target.id,
-        score: r.score,
-        distance: r.distance
-      }))
-    };
-
+    // Submit score to Leaderboard API
     try {
+      const payload = {
+        name: this.playerName || "Anonym Gløsing",
+        score: this.totalScore,
+        totalDistance: totalDist,
+        date: this.todayDate,
+        rounds: this.roundsData.map(r => ({
+          target: r.target.id,
+          score: r.score,
+          distance: r.distance
+        }))
+      };
+
       const resp = await fetch('/api/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -960,28 +980,95 @@ class NTNUGuesserGame {
 
       if (resp.ok) {
         const result = await resp.json();
-        // Save daily completion in localStorage
-        localStorage.setItem(`ntnu_daily_done_${this.todayDate}`, JSON.stringify({
-          score: score,
-          rank: result.rank
-        }));
-
-        if (this.elements.leaderboardPlacementBanner) {
-          const medal = result.rank === 1 ? '🥇' : (result.rank === 2 ? '🥈' : (result.rank === 3 ? '🥉' : '🏆'));
-          this.elements.placementIcon.textContent = medal;
-          this.elements.placementText.innerHTML = `Du kom på <strong>#${result.rank}. plass</strong> på dagens felles leaderboard!`;
+        if (result.percentile !== undefined) {
+          this.percentile = result.percentile;
         }
+        if (result.rank !== undefined) {
+          this.rank = result.rank;
+        }
+        this.allScores = result.allScores || [];
 
-        // Render live leaderboard inside game over
+        // Populate live leaderboard table in game over
         this.populateLeaderboardTable(result.leaderboard || [], this.elements.gameoverLeaderboardBody);
-        this.loadLeaderboardPreview();
       }
     } catch (e) {
       console.warn("Could not post score to server:", e);
-      if (this.elements.leaderboardPlacementBanner) {
-        this.elements.placementText.textContent = `Score registrert lokalt: ${score.toLocaleString('no-NO')} poeng!`;
-      }
     }
+
+    // Update Percentile Banner & Subtext
+    if (this.elements.percentileValue) {
+      this.elements.percentileValue.textContent = `${this.percentile}%`;
+    }
+    if (this.elements.rankValue) {
+      this.elements.rankValue.textContent = this.rank;
+    }
+
+    // Show Game Over Modal
+    this.elements.gameOverModal.classList.remove('hidden');
+
+    // Draw the Bell Curve with slight delay so canvas has dimensions
+    setTimeout(() => {
+      drawBellCurve(this.elements.bellCurveCanvas, this.totalScore, this.percentile, this.allScores);
+    }, 100);
+  }
+
+  async openLeaderboardModal(tab = 'daily') {
+    this.elements.leaderboardModal.classList.remove('hidden');
+    if (tab === 'daily') {
+      this.elements.tabDailyLeaderboard.classList.add('active');
+      this.elements.tabAlltimeLeaderboard.classList.remove('active');
+    } else {
+      this.elements.tabDailyLeaderboard.classList.remove('active');
+      this.elements.tabAlltimeLeaderboard.classList.add('active');
+    }
+
+    const tbody = this.elements.leaderboardTableBody;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94A3B8;">Laster inn toppliste...</td></tr>`;
+
+    try {
+      const resp = await fetch(`/api/leaderboard?type=${tab}&date=${this.todayDate}`);
+      if (resp.ok) {
+        const data = await resp.json();
+        this.populateLeaderboardTable(data.entries || [], tbody);
+      }
+    } catch (e) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #EF4444;">Kunne ikke laste topplisten.</td></tr>`;
+    }
+  }
+
+  populateLeaderboardTable(entries, tbody) {
+    if (!tbody) return;
+    if (!entries || entries.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #94A3B8;">Ingen resultater registrert ennå. Bli den første! 🚀</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = '';
+    const medals = ['🥇', '🥈', '🥉'];
+
+    entries.forEach((r, idx) => {
+      const tr = document.createElement('tr');
+      const isUser = this.playerName && r.name.toLowerCase() === this.playerName.toLowerCase();
+      if (isUser) tr.classList.add('user-row');
+
+      const rankBadge = medals[idx] ? `<span class="medal-icon">${medals[idx]}</span>` : `${idx + 1}.`;
+      const distStr = r.totalDistance < 1000 ? `${Math.round(r.totalDistance)} m` : `${(r.totalDistance / 1000).toFixed(1)} km`;
+
+      let timeStr = "";
+      if (r.created_at) {
+        const parts = r.created_at.split(' ');
+        timeStr = parts[1] ? parts[1].slice(0, 5) : "";
+      }
+
+      tr.innerHTML = `
+        <td style="font-weight: 800; text-align: center;">${rankBadge}</td>
+        <td><strong>${this.escapeHtml(r.name)}</strong>${isUser ? ' <span class="user-badge">DEG</span>' : ''}</td>
+        <td><span class="score-pill">${r.score.toLocaleString('no-NO')}</span></td>
+        <td style="color: #94A3B8;">${distStr}</td>
+        ${r.created_at ? `<td style="color: #64748B; font-size: 0.8rem;">${timeStr}</td>` : ''}
+      `;
+      tbody.appendChild(tr);
+    });
   }
 
   shareScoreToClipboard() {
@@ -999,11 +1086,10 @@ class NTNUGuesserGame {
       emojiRounds += `\n${icon} R${r.round}: ${r.score}p (${dist})`;
     });
 
-    const modeLabel = this.gameMode === 'daily' ? `Dagens Utfordring #${this.dayNumber}` : 'Øvingsmodus';
-    const shareText = `📍 NTNU GUESSER • ${modeLabel}\nSpiller: ${this.playerName || "Gløsing"}\nScore: ${this.totalScore.toLocaleString('no-NO')} / 25 000 poeng!${emojiRounds}\n\nSpill og sjekk dagens leaderboard: NTNU-Guesser!`;
+    const shareText = `📍 NTNU GUESSER • Dagens Utfordring #${this.dayNumber}\nSpiller: ${this.playerName || "Gløsing"}\nPoeng: ${this.totalScore.toLocaleString('no-NO')} / 25 000 (#${this.rank})\n📈 Bedre enn ${this.percentile}% av spillerne!${emojiRounds}\n\nSpill nå: NTNU-Guesser!`;
 
     navigator.clipboard.writeText(shareText).then(() => {
-      this.elements.shareFeedback.textContent = "Resultat og emoji-kort kopiert! 📋";
+      this.elements.shareFeedback.textContent = "Kopiert til utklippstavlen! 📋";
       this.elements.shareFeedback.classList.remove('hidden');
       setTimeout(() => {
         this.elements.shareFeedback.classList.add('hidden');

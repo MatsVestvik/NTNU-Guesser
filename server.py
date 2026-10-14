@@ -120,6 +120,10 @@ class NTNUHandler(http.server.SimpleHTTPRequestHandler):
                 
                 rows = cursor.fetchall()
 
+                # Get all scores for distribution
+                cursor.execute("SELECT score FROM leaderboard WHERE challenge_date = ? ORDER BY score ASC", (query_date,))
+                all_scores = [r[0] for r in cursor.fetchall()]
+
             entries = []
             for rank, r in enumerate(rows, 1):
                 entries.append({
@@ -134,7 +138,9 @@ class NTNUHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json_response({
                 "type": l_type,
                 "date": query_date,
-                "entries": entries
+                "entries": entries,
+                "allScores": all_scores,
+                "totalPlayers": len(all_scores)
             })
             return
 
@@ -157,7 +163,7 @@ class NTNUHandler(http.server.SimpleHTTPRequestHandler):
             name = str(payload.get('name', '')).strip()
             if not name:
                 name = "Anonym Gløsing"
-            name = name[:24] # Limit name length
+            name = name[:24]
 
             try:
                 score = int(payload.get('score', 0))
@@ -187,6 +193,21 @@ class NTNUHandler(http.server.SimpleHTTPRequestHandler):
                 """, (challenge_date, score, score, total_distance))
                 user_rank = cursor.fetchone()[0]
 
+                # Fetch all scores for percentile & curve
+                cursor.execute("SELECT score FROM leaderboard WHERE challenge_date = ? ORDER BY score ASC", (challenge_date,))
+                all_scores = [r[0] for r in cursor.fetchall()]
+                total_players = len(all_scores)
+
+                # Calculate empirical percentile
+                lower_count = sum(1 for s in all_scores if s < score)
+                if total_players > 1:
+                    percentile = int(round((lower_count / (total_players - 1)) * 100))
+                else:
+                    import math
+                    z = (score - 16500) / 4000
+                    percentile = int(round(0.5 * (1 + math.erf(z / math.sqrt(2))) * 100))
+                percentile = max(1, min(99, percentile))
+
                 # Fetch updated top 50
                 cursor.execute("""
                     SELECT name, score, total_distance, challenge_date, created_at
@@ -211,6 +232,9 @@ class NTNUHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json_response({
                 "success": True,
                 "rank": user_rank,
+                "totalPlayers": total_players,
+                "percentile": percentile,
+                "allScores": all_scores,
                 "insertedId": inserted_id,
                 "leaderboard": entries
             })
