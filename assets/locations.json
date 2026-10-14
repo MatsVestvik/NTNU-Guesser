@@ -219,5 +219,44 @@
     "lore": "Gamle Elektro sto ferdig i 1910 i tegl og granitt. Sammen med Hovedbygningen og Gamle Kjemi utgjør dette NTHs opprinnelige campus-trio.",
     "hint": "Historisk teglsteinsfasade ved siden av lokomotivet Ohma Electra.",
     "image": "assets/locations/gamle_elektro.jpg"
+  },
+  {
+    "id": "elgeseter_bru",
+    "title": "File:Elgeseter bru Trondheim 2022-08-18 01.jpg",
+    "name": "Elgeseter bru (mot Samfundet)",
+    "campus": "Samfundet",
+    "coords": [
+      63.42435,
+      10.3957
+    ],
+    "lore": "Hovedåren mellom Midtbyen og Gløshaugen! Tusenvis av studenter sykler og går over Nidelva her hver eneste dag på vei til forelesninger og Samfundet.",
+    "hint": "Bro over Nidelva med utsikt sørover mot Samfundet og Gløshaugen-høyden.",
+    "image": "assets/locations/elgeseter_bru.jpg"
+  },
+  {
+    "id": "tyholttaarnet",
+    "title": "File:Tyholttårnet i Trondheim 2021.jpg",
+    "name": "Tyholttårnet (ved Marinteknisk)",
+    "campus": "Tyholt",
+    "coords": [
+      63.4225,
+      10.4318
+    ],
+    "lore": "Det 124 meter høye telekommunikasjons- og utsiktstårnet på Tyholt, rett ved NTNUs marintekniske senter. Kjent for Egon-restauranten som roterer 360 grader!",
+    "hint": "Høyt tårn med roterende kuppel på Tyholt-høyden.",
+    "image": "assets/locations/tyholttaarnet.jpg"
+  },
+  {
+    "id": "gloshaugen_utsikt",
+    "title": "File:Kristiansten festning - utsikt mot NTNU, 2023.jpg",
+    "name": "Utsikt mot NTNU Gløshaugen",
+    "campus": "Gløshaugen",
+    "coords": [
+      63.4272,
+      10.4115
+    ],
+    "lore": "Den klassiske Trondheims-utsikten mot NTNU Gløshaugen og Hovedbygningen som troner stolt over byens skyline.",
+    "hint": "Panoramautsikt over Gløshaugen-platået og Hovedbygningen fra nordøst.",
+    "image": "assets/locations/gloshaugen_utsikt.jpg"
   }
 ]

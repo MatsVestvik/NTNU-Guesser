@@ -1,4 +1,4 @@
-# 📍 NTNU Guesser
+# 📍 NTNU Guesser - Daily Challenge & Felles Leaderboard
 
 Et interaktivt nettleserspill inspirert av GeoGuessr – dedikert **100% til NTNUs campuser** i Trondheim!
 
@@ -8,13 +8,25 @@ Et interaktivt nettleserspill inspirert av GeoGuessr – dedikert **100% til NTN
 
 ## 🌟 Funksjoner
 
-- **🎯 Ekte NTNU-lokasjoner**: 17 håndplukkede, høyoppløselige lokasjoner på tvers av:
-  - **Campus Gløshaugen**: Hovedbygningen (front & øst), Realfagbygget (eksteriør & interiør), Sentralbygg 1 / Stripa, Gamle Fysikk, Gamle Kjemi, Gamle Elektro, Kjelhuset, Dødens Dal og lokomotivet Ohma Electra!
-  - **Campus Dragvoll**: Paviljongene, Gata og utsikten over åkrene.
-  - **Studentersamfundet i Trondhjem**: Det Røde Runde Huset ved Elgeseter bru.
-  - **Campus Tyholt**: Marinteknisk senter, biblioteket og skipstanken.
-  - **Campus Kalvskinnet**: Historiske Gunnerusbiblioteket.
-  - **Campus Øya**: Kunnskapssenteret ved St. Olavs hospital.
+- **📅 Dagens Utfordring (Daily Challenge)**:
+  - 5 nye håndplukkede NTNU-bilder hver eneste dag ved midnatt.
+  - Deterministisk generert via dato-seedet PRNG: **alle spillere får nøyaktig de samme 5 bildene** på samme dag!
+  - Nedtelling til neste daglige utfordring.
+- **🏷️ Display Name & Profil**:
+  - Skriv inn ditt kallenavn/visningsnavn før runden starter.
+  - Huskes automatisk i nettleseren og registreres direkte på leaderboarden.
+- **🏆 Felles Leaderboard (SQLite-backed API)**:
+  - **Dagens Toppliste**: Se hvem som leder dagens utfordring i sanntid.
+  - **All-Time Hall of Fame**: De beste poengsummene noensinne.
+  - Rangeringsmedaljer (🥇 1. plass, 🥈 2. plass, 🥉 3. plass), poengsum, totalt avvik i meter, og tidsstempel.
+  - Eget bruker-highlight («DEG») slik at du ser akkurat hvor du plasserer deg.
+- **🎯 20 Ekte NTNU-lokasjoner**:
+  - **Gløshaugen**: Hovedbygningen (front & øst), Realfagbygget (eksteriør & interiør), Sentralbygg 1 / Stripa, Gamle Fysikk, Gamle Kjemi, Gamle Elektro, Kjelhuset, Dødens Dal, lokomotivet Ohma Electra og utsikten mot Gløs!
+  - **Dragvoll**: Paviljongene, Gata og utsikten over åkrene.
+  - **Studentersamfundet i Trondhjem**: Det Røde Runde Huset og Elgeseter bru.
+  - **Tyholt**: Marinteknisk senter, biblioteket, skipstanken og Tyholttårnet.
+  - **Kalvskinnet**: Historiske Gunnerusbiblioteket.
+  - **Øya**: Kunnskapssenteret ved St. Olavs hospital.
   - **Moholt Studentby**: Massivtre-tårnene på Moholt Allmenning.
 - **🧭 360° / Panoramavisning**:
   - Klikk og dra for å se deg rundt med realistisk fysikk og bevegelsestreghet.
@@ -36,22 +48,20 @@ Et interaktivt nettleserspill inspirert av GeoGuessr – dedikert **100% til NTN
   - `10 000 - 14 999`: Forvillet Førsteklassing på jakt etter R1 🎒
   - `< 10 000`: Tok linje 3 til feil ende av byen 🚌💨
 - **🔊 Syntetisert Lyddesign (Web Audio API)**:
-  - Klikkelyder, nålplassering, spenningseffekter, poengtellere og seiersfanfarer generert direkte i nettleseren uten eksterne lydfiler.
+  - Klikkelyder, nålplassering, spenningseffekter, poengtellere og seiersfanfarer generert direkte i nettleseren.
 - **📋 Deling & Konfetti**:
-  - Visuell oppsummering av alle 5 runder med linjer og markører.
-  - Emoji-grid for enkel deling i Discord, Slack eller sosiale medier.
-  - Feiring med konfettikanon ved fullført spill.
+  - Resultat-delig med Wordle/GeoGuessr emoji-grid for Discord, Slack og sosiale medier.
+  - Feiring med konfettikanon ved fullført runde.
 
 ---
 
 ## 🚀 Hvordan starte spillet lokalt
 
-### Alternativ 1: Python-server (Anbefalt)
-Kjør den inkluderte Python-serveren:
+Start Python-serveren som håndterer både spillet og Leaderboard-API-et:
 ```bash
 python3 server.py
 ```
-Åpne deretter nettleseren på:
+Åpne deretter i nettleseren:
 👉 **[http://localhost:8080](http://localhost:8080)**
 
 For å åpne nettleseren automatisk:
@@ -59,26 +69,21 @@ For å åpne nettleseren automatisk:
 python3 server.py --open
 ```
 
-### Alternativ 2: Direkte i nettleseren
-Du kan også åpne [index.html](file:///home/mats/Prosjekter/NTNU-Guesser/index.html) direkte i favorittnettleseren din!
-
 ---
 
 ## 🎮 Spillmoduser
 
-1. **Alle Campuser**: Lokasjoner tilfeldig trukket fra Gløshaugen, Dragvoll, Samfundet, Kalvskinnet, Tyholt, Øya og Moholt.
-2. **Kun Gløshaugen**: Eksklusivt fokus på Gløshaugens klassiske og hemmelige hjørner.
-3. **Valgfri Timer**:
-   - Ingen tidsfrist (Chille og utforske)
-   - 60 sekunder per runde
-   - 30 sekunder (Speedrun for proffer)
+1. **📅 Dagens Utfordring (Daily Challenge)**:
+   - 5 felles lokasjoner valgt ut for dagen.
+   - Poengsummen din registreres på dagens felles leaderboard med ditt kallenavn!
+2. **🎯 Øvingsmodus (Practice)**:
+   - Ubegrenset fri trening med tilfeldige lokasjoner for å finpusse campuskunnskapene.
 
 ---
 
 ## 🛠️ Teknologistakk
 
-- **HTML5 & Vanilla JavaScript (ES6+)**: Rask, lettvektig og fri for tunge rammeverk.
-- **Vanilla CSS3**: Glassmorphism, CSS Custom Properties og flytende mikromotstand.
-- **Leaflet.js**: Interaktivt kart med Esri Satellite og CartoDB Voyager.
-- **Web Audio API**: Prosedyrisk lydsyntese i sanntid.
-- **HTML5 Canvas**: Konfetti-partikkelsystem.
+- **Backend**: Python 3 HTTP Server med innebygd SQLite-database (`data/leaderboard.db`) og REST API (`/api/daily`, `/api/leaderboard`, `/api/score`).
+- **Frontend**: HTML5, Vanilla JavaScript (ES6+), Vanilla CSS3 med Glassmorphism & Dark Mode.
+- **Kart**: Leaflet.js med Esri World Imagery (satellitt) og CartoDB Voyager (gatekart).
+- **Lyd**: Web Audio API (prosedural sanntidslyd).

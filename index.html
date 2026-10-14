@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>NTNU Guesser - Hvor godt kjenner du NTNU?</title>
-  <meta name="description" content="Et interaktivt GeoGuessr-spill eksklusivt for NTNUs campuser: Gløshaugen, Dragvoll, Samfundet, Kalvskinnet, Tyholt og Øya!">
+  <title>NTNU Guesser - Dagens Utfordring & Felles Leaderboard</title>
+  <meta name="description" content="Det daglige GeoGuessr-spillet for NTNU! 5 nye steder hver dag – gjett plasseringen og konkurrer på felles leaderboard!">
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Outfit:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Local Leaflet with CDN fallback -->
+  <!-- Local Leaflet -->
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
 
   <!-- Main Game Styles -->
@@ -29,13 +29,19 @@
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
         </div>
-        <div class="brand-title">NTNU GUESSER</div>
-        <span class="brand-tag">TRONDHEIM</span>
+        <div>
+          <div class="brand-title">NTNU GUESSER</div>
+          <div class="brand-subtitle" id="daily-date-subtitle">DAGENS UTFORDRING</div>
+        </div>
       </div>
 
       <div class="hud-center">
         <div class="hud-pill" id="round-display">Runde 1 / 5</div>
         <div class="hud-pill highlight" id="score-display">Poeng: 0</div>
+        <div class="hud-pill player-pill" id="player-hud-pill">
+          <span class="player-dot"></span>
+          <span id="player-hud-name">Spiller</span>
+        </div>
         <div class="hud-pill timer-pill hidden" id="timer-badge">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           <span id="timer-display">1:00</span>
@@ -43,13 +49,17 @@
       </div>
 
       <div class="header-actions">
+        <button class="nav-action-btn leaderboard-nav-btn" id="header-leaderboard-btn" title="Åpne Leaderboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-2.34"></path><path d="M18 14.66V17c0 .55-.45 1-1 1h-2c-.55 0-1-.45-1-1v-2.34"></path><path d="M14 17v-4c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v4"></path></svg>
+          <span>Toppliste</span>
+        </button>
         <button class="icon-btn" id="mute-btn" title="Lyd av/på">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
         </button>
         <button class="icon-btn" id="help-btn" title="Hvordan spille">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
         </button>
-        <button class="icon-btn" id="settings-btn" title="Innstillinger & Modus">
+        <button class="icon-btn" id="settings-btn" title="Spillmeny & Navn">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
       </div>
@@ -123,68 +133,110 @@
       </div>
     </div>
 
-    <!-- ================= WELCOME / CONFIG MODAL ================= -->
+    <!-- ================= WELCOME / DAILY START MODAL ================= -->
     <div class="modal-backdrop" id="start-modal">
       <div class="modal-card">
+        <div class="modal-header-centered">
+          <div class="daily-badge" id="daily-badge-pill">📅 DAGENS UTFORDRING</div>
+          <h2 class="modal-title">Hvor godt kjenner du NTNU i dag?</h2>
+          <p class="modal-desc">
+            Fem nye NTNU-steder hver eneste dag. Alle studenter får nøyaktig de samme 5 bildene. Gjett riktig, samle poeng og klatre på felles leaderboard!
+          </p>
+        </div>
+
+        <!-- Display Name Input (Required for Leaderboard) -->
+        <div class="displayname-card">
+          <label class="displayname-label" for="player-displayname">
+            <span>Ditt Kallenavn / Display Name</span>
+            <small>Vises på dagens felles leaderboard</small>
+          </label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <input type="text" id="player-displayname" placeholder="F.eks. Mats, SivIng_Gløs, SamfundetHero..." maxlength="20" autocomplete="nickname">
+          </div>
+          <div class="validation-error hidden" id="name-validation-error">Vennligst oppgi et kallenavn (minst 2 tegn) før du starter!</div>
+        </div>
+
+        <!-- Daily Status or Already Played Banner -->
+        <div class="daily-status-box" id="daily-status-box">
+          <div class="daily-status-content">
+            <span class="status-icon">🎯</span>
+            <div>
+              <strong id="daily-challenge-title">Dagens utfordring er klar!</strong>
+              <div class="daily-countdown-text" id="daily-countdown-text">Neste utfordring slippes ved midnatt</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mode Buttons -->
+        <div class="start-actions-group">
+          <button class="primary-btn pulse-glow" id="btn-start-game">
+            Start Dagens Utfordring 🚀
+          </button>
+          <div class="secondary-actions-row">
+            <button class="secondary-btn" id="btn-view-leaderboard-modal">
+              🏆 Se Dagens Toppliste
+            </button>
+            <button class="secondary-btn" id="btn-start-practice">
+              🎯 Øvingsmodus
+            </button>
+          </div>
+        </div>
+
+        <!-- Mini Live Leaderboard Preview -->
+        <div class="mini-leaderboard-preview">
+          <div class="preview-header">
+            <span>🏆 Dagens Topp 5</span>
+            <span class="live-tag">● LIVE</span>
+          </div>
+          <div class="mini-leaderboard-list" id="mini-leaderboard-list">
+            <div class="leaderboard-loading">Laster leaderboard...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= DEDICATED LEADERBOARD MODAL ================= -->
+    <div class="modal-backdrop hidden" id="leaderboard-modal">
+      <div class="modal-card wide">
         <div class="modal-header">
-          <h2 class="modal-title">Velkommen til NTNU Guesser!</h2>
-        </div>
-        <p class="modal-desc">
-          Test lokalkunnskapen din! Du blir plassert et hemmelig sted på NTNUs campuser i Trondheim. Se deg rundt, zoom inn på detaljer og plasser nålen på kartet.
-        </p>
-
-        <!-- Campus Selection -->
-        <div class="config-group">
-          <span class="config-label">Velg Campus</span>
-          <div class="radio-cards-grid">
-            <div class="radio-card">
-              <input type="radio" name="campus-filter" id="filter-all" value="all" checked>
-              <label for="filter-all">
-                <strong>Alle Campuser</strong>
-                <span>Gløs, Dragvoll, Samfundet, Tyholt, Øya & Kalvskinnet</span>
-              </label>
-            </div>
-            <div class="radio-card">
-              <input type="radio" name="campus-filter" id="filter-gloshaugen" value="gloshaugen">
-              <label for="filter-gloshaugen">
-                <strong>Kun Gløshaugen</strong>
-                <span>Hovedbygningen, Stripa, Realfagbygget og kriker & kroker</span>
-              </label>
-            </div>
+          <div>
+            <h2 class="modal-title">🏆 NTNU Guesser Toppliste</h2>
+            <p class="modal-subtext" id="leaderboard-subtitle">Felles leaderboard for alle NTNU-studenter</p>
           </div>
+          <button class="icon-btn" id="btn-close-leaderboard">✕</button>
         </div>
 
-        <!-- Timer Selection -->
-        <div class="config-group">
-          <span class="config-label">Tidsfrist per runde</span>
-          <div class="radio-cards-grid">
-            <div class="radio-card">
-              <input type="radio" name="timer-duration" id="timer-none" value="0" checked>
-              <label for="timer-none">
-                <strong>Ingen tid</strong>
-                <span>Chille og utforske</span>
-              </label>
-            </div>
-            <div class="radio-card">
-              <input type="radio" name="timer-duration" id="timer-60" value="60">
-              <label for="timer-60">
-                <strong>60 sekunder</strong>
-                <span>Klassisk tempo</span>
-              </label>
-            </div>
-            <div class="radio-card">
-              <input type="radio" name="timer-duration" id="timer-30" value="30">
-              <label for="timer-30">
-                <strong>30 sekunder</strong>
-                <span>Speedrun for proffer</span>
-              </label>
-            </div>
+        <!-- Leaderboard Tabs -->
+        <div class="leaderboard-tabs">
+          <button class="tab-btn active" id="tab-daily-leaderboard">📅 I Dag (<span id="tab-date-label">I dag</span>)</button>
+          <button class="tab-btn" id="tab-alltime-leaderboard">👑 All-Time Legender</button>
+        </div>
+
+        <!-- Leaderboard Table Container -->
+        <div class="leaderboard-table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">Plass</th>
+                <th>Spiller</th>
+                <th>Poeng</th>
+                <th>Avvik</th>
+                <th>Tid</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-table-body">
+              <tr><td colspan="5" style="text-align: center; padding: 20px;">Laster inn topplisten...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="modal-footer-row">
+          <div class="next-challenge-clock">
+            ⏳ Neste utfordring om: <span id="clock-countdown" class="clock-digits">--:--:--</span>
           </div>
+          <button class="primary-btn compact" id="btn-play-from-leaderboard">Spill Nå 🚀</button>
         </div>
-
-        <button class="primary-btn" id="btn-start-game">
-          Start Spillet 🚀
-        </button>
       </div>
     </div>
 
@@ -231,9 +283,21 @@
           <p class="diploma-rank-desc" id="final-rank-desc">
             Eksepsjonell innsats! Du kjenner hver eneste brostein og auditorium på campus!
           </p>
+
+          <!-- Leaderboard Placement Badge -->
+          <div class="leaderboard-placement-banner" id="leaderboard-placement-banner">
+            <span class="placement-icon" id="placement-icon">🏆</span>
+            <div id="placement-text">Registrert på dagens leaderboard!</div>
+          </div>
         </div>
 
-        <div class="recap-table-container">
+        <!-- Tabs inside Game Over: Rounds Recap vs Live Leaderboard -->
+        <div class="gameover-tabs">
+          <button class="tab-btn active" id="tab-gameover-recap">📋 Dine 5 Runder</button>
+          <button class="tab-btn" id="tab-gameover-leaderboard">🏆 Dagens Toppliste</button>
+        </div>
+
+        <div class="recap-table-container" id="gameover-recap-section">
           <table class="recap-table">
             <thead>
               <tr>
@@ -249,10 +313,29 @@
           </table>
         </div>
 
+        <div class="leaderboard-table-container hidden" id="gameover-leaderboard-section">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Plass</th>
+                <th>Spiller</th>
+                <th>Poeng</th>
+                <th>Avvik</th>
+              </tr>
+            </thead>
+            <tbody id="gameover-leaderboard-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
         <div class="game-over-actions">
           <button class="secondary-btn" id="btn-share-score">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
             Del Resultat
+          </button>
+          <button class="secondary-btn" id="btn-explore-recap-map">
+            🗺️ Utforsk Kartet
           </button>
           <button class="primary-btn" id="btn-play-again">
             Spill Igjen 🔄
@@ -266,34 +349,39 @@
     <div class="modal-backdrop hidden" id="help-modal">
       <div class="modal-card">
         <div class="modal-header">
-          <h2 class="modal-title">Slik spiller du</h2>
+          <h2 class="modal-title">Slik fungerer Daily Game</h2>
           <button class="icon-btn" id="btn-close-help">✕</button>
         </div>
         <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px;">
           <div style="display: flex; gap: 14px; align-items: flex-start;">
             <div style="background: rgba(0, 112, 243, 0.2); color: #38BDF8; font-weight: 800; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</div>
             <div>
-              <strong style="display: block; margin-bottom: 4px;">Utforsk omgivelsene</strong>
-              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Klikk og dra for å se deg rundt i 360°. Bruk rullehjulet eller +/- knappene for å zoome inn på skilt, fasader og landemerker.</p>
+              <strong style="display: block; margin-bottom: 4px;">5 Felles Daglige Bilder</strong>
+              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Hver dag ved midnatt trekkes 5 nye NTNU-steder. Alle spillere får nøyaktig de samme 5 bildene!</p>
             </div>
           </div>
           <div style="display: flex; gap: 14px; align-items: flex-start;">
             <div style="background: rgba(16, 185, 129, 0.2); color: #10B981; font-weight: 800; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</div>
             <div>
-              <strong style="display: block; margin-bottom: 4px;">Finn stedet på kartet</strong>
-              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Bruk minikartet nede til høyre. Du kan klikke på hurtigknappene (Gløs, Dragvoll, Samfundet osv.) for å hoppe rett til rett campus!</p>
+              <strong style="display: block; margin-bottom: 4px;">Oppgi Kallenavn</strong>
+              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Skriv inn ditt ønskede visningsnavn før du starter. Dette lagres og vises på dagens felles leaderboard.</p>
             </div>
           </div>
           <div style="display: flex; gap: 14px; align-items: flex-start;">
             <div style="background: rgba(245, 158, 11, 0.2); color: #F59E0B; font-weight: 800; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</div>
             <div>
-              <strong style="display: block; margin-bottom: 4px;">Plasser nålen & gjett</strong>
-              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Klikk på kartet for å sette en markør. Trykk "GJETT HER" for å bekrefte. Jo nærmere du treffer (innen 15 meter er perfekt 5 000 poeng!), jo mer heder og ære får du!</p>
+              <strong style="display: block; margin-bottom: 4px;">Konkurrer på Topplisten</strong>
+              <p style="font-size: 0.88rem; color: #94A3B8; line-height: 1.4;">Plasser nålen så nærme målet som mulig. Maks 5 000 poeng per runde (25 000 totalt). Se hvem som kjenner NTNU best i Trondheim!</p>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Floating button when exploring map at Game Over -->
+    <button class="back-to-summary-btn hidden" id="btn-back-to-summary">
+      ⬅ Tilbake til Resultater & Leaderboard
+    </button>
 
     <!-- Confetti canvas for victory celebration -->
     <canvas id="confetti-canvas"></canvas>
