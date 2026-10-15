@@ -309,11 +309,8 @@ class NTNUGuesserGame {
       gameoverRecapSection: document.getElementById('gameover-recap-section'),
       gameoverLeaderboardBody: document.getElementById('gameover-leaderboard-body'),
       recapTableBody: document.getElementById('recap-table-body'),
-      btnShareScore: document.getElementById('btn-share-score'),
       btnExploreRecapMap: document.getElementById('btn-explore-recap-map'),
       btnPlayAgain: document.getElementById('btn-play-again'),
-      btnBackToSummary: document.getElementById('btn-back-to-summary'),
-      shareFeedback: document.getElementById('share-feedback'),
 
       // Help Modal
       helpModal: document.getElementById('help-modal'),
@@ -347,7 +344,7 @@ class NTNUGuesserGame {
     const dateObj = new Date(this.todayDate);
     const dateFormatted = dateObj.toLocaleDateString('no-NO', { day: 'numeric', month: 'long' });
     if (this.elements.dailyDateSubtitle) {
-      this.elements.dailyDateSubtitle.textContent = `DAGENS UTFORDRING #${this.dayNumber} • ${dateFormatted.toUpperCase()}`;
+      this.elements.dailyDateSubtitle.textContent = dateFormatted.toUpperCase();
     }
     if (this.elements.tabDateLabel) {
       this.elements.tabDateLabel.textContent = dateFormatted;
@@ -518,20 +515,6 @@ class NTNUGuesserGame {
         soundManager.playClick();
         this.elements.gameOverModal.classList.add('hidden');
         this.toggleMapSize(true);
-        this.elements.mapWidget.classList.add('result-expanded');
-        if (this.elements.btnBackToSummary) {
-          this.elements.btnBackToSummary.classList.remove('hidden');
-        }
-      });
-    }
-
-    // Back to summary from map exploration
-    if (this.elements.btnBackToSummary) {
-      this.elements.btnBackToSummary.addEventListener('click', () => {
-        soundManager.playClick();
-        this.elements.btnBackToSummary.classList.add('hidden');
-        this.toggleMapSize(false);
-        this.elements.gameOverModal.classList.remove('hidden');
       });
     }
 
@@ -712,6 +695,9 @@ class NTNUGuesserGame {
       if (this.elements.btnToggleMapSize) {
         this.elements.btnToggleMapSize.title = 'Maksimer kart';
       }
+      if (!this.gameActive && this.elements.gameOverModal && this.roundsData.length >= this.totalRounds) {
+        this.elements.gameOverModal.classList.remove('hidden');
+      }
     }
 
     // Invalidate Leaflet at staggered intervals to prevent grey tiles during animation
@@ -758,7 +744,7 @@ class NTNUGuesserGame {
     this.currentLocation = this.selectedLocations[index];
 
     // Reset UI state
-    this.elements.roundDisplay.textContent = `${index + 1}/${this.totalRounds}`;
+    this.elements.roundDisplay.textContent = `Runde ${index + 1}/${this.totalRounds}`;
     this.elements.btnGuess.disabled = true;
     this.elements.btnGuess.classList.remove('ready');
 

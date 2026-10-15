@@ -69,95 +69,67 @@ html, body {
 }
 
 /* ==========================================================================
-   HEADER / NAVBAR
+   COMPACT UPPER RIGHT HUD BOX (Date, Round, Points)
    ========================================================================== */
 
-.game-header {
+.game-hud-box {
   position: absolute;
-  top: 16px;
-  left: 20px;
+  top: 18px;
   right: 20px;
-  height: 64px;
   z-index: 100;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
+  gap: 8px;
+  padding: 6px 12px;
   background: var(--bg-glass);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border: 1px solid var(--border-glass);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-full);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
 }
 
-.brand {
+.hud-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  white-space: nowrap;
 }
 
-.brand-icon {
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--ntnu-navy);
-  border-radius: var(--radius-md);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.brand-title {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
+.hud-item.hud-date {
+  font-size: 0.78rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  color: #FFFFFF;
-}
-
-.brand-tag {
-  font-size: 0.7rem;
-  font-weight: 700;
+  color: #94A3B8;
+  letter-spacing: 0.8px;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: var(--ntnu-cyan);
-  background: rgba(56, 189, 248, 0.12);
-  padding: 2px 8px;
+  padding: 0 6px;
+}
+
+.hud-item.hud-round {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #F8FAFC;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 4px 10px;
   border-radius: var(--radius-full);
-  margin-left: 4px;
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Game Status HUD */
-.hud-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.hud-pill {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--bg-glass-light);
-  border: 1px solid var(--border-glass);
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.hud-pill.highlight {
-  border-color: rgba(0, 112, 243, 0.4);
-  background: rgba(0, 112, 243, 0.15);
+.hud-item.hud-score {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
   color: var(--ntnu-cyan);
+  background: rgba(0, 112, 243, 0.18);
+  border: 1px solid rgba(0, 112, 243, 0.35);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+}
+
+.hud-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .timer-pill {
@@ -1064,30 +1036,30 @@ html, body {
    RESPONSIVE DESIGN (TABLET & MOBILE)
    ========================================================================== */
 
-@media (max-width: 768px) {
-  .game-header {
+  .game-hud-box {
     top: 10px;
-    left: 10px;
     right: 10px;
-    padding: 0 12px;
-    height: 56px;
+    padding: 4px 8px;
+    gap: 6px;
   }
 
-  .brand-title {
-    font-size: 1rem;
+  .hud-item.hud-date {
+    font-size: 0.7rem;
+    padding: 0 2px;
   }
 
-  .brand-tag {
-    display: none;
+  .hud-item.hud-round {
+    font-size: 0.75rem;
+    padding: 3px 7px;
   }
 
-  .hud-center {
-    gap: 8px;
+  .hud-item.hud-score {
+    font-size: 0.78rem;
+    padding: 3px 8px;
   }
 
-  .hud-pill {
-    padding: 6px 10px;
-    font-size: 0.8rem;
+  .hud-divider {
+    height: 13px;
   }
 
   .compass-widget {
@@ -1560,26 +1532,3 @@ html, body {
   height: 42px;
 }
 
-.back-to-summary-btn {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 170;
-  padding: 10px 20px;
-  background: var(--bg-dark);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-full);
-  color: #FFFFFF;
-  font-family: var(--font-display);
-  font-size: 0.9rem;
-  font-weight: 700;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.back-to-summary-btn:hover {
-  transform: translateX(-50%) translateY(-2px);
-  background: var(--ntnu-navy);
-}

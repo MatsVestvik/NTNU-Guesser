@@ -20,25 +20,13 @@
 </head>
 <body>
   <div id="app">
-    <!-- ================= TOP HEADER / HUD ================= -->
-    <header class="game-header">
-      <div class="brand">
-        <div class="brand-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-        </div>
-        <div>
-          <div class="brand-title">NTNU GUESSER</div>
-          <div class="brand-subtitle" id="daily-date-subtitle">DAGENS UTFORDRING</div>
-        </div>
-      </div>
-
-      <div class="hud-center">
-        <div class="hud-pill" id="round-display">1/5</div>
-        <div class="hud-pill highlight" id="score-display">Poeng: 0</div>
-      </div>
+    <!-- ================= UPPER RIGHT HUD BOX ================= -->
+    <header class="game-hud-box">
+      <div class="hud-item hud-date" id="daily-date-subtitle">15. OKTOBER</div>
+      <div class="hud-divider"></div>
+      <div class="hud-item hud-round" id="round-display">Runde 1/5</div>
+      <div class="hud-divider"></div>
+      <div class="hud-item hud-score" id="score-display">Poeng: 0</div>
     </header>
 
     <!-- ================= PANORAMA VIEWPORT ================= -->
@@ -263,10 +251,6 @@
     </div>
 
 
-    <!-- Floating button when exploring map at Game Over -->
-    <button class="back-to-summary-btn hidden" id="btn-back-to-summary">
-      Tilbake til resultat
-    </button>
 
     <!-- Confetti canvas for victory celebration -->
     <canvas id="confetti-canvas"></canvas>
