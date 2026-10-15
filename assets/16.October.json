@@ -1,0 +1,52 @@
+[
+  {
+    "id": "gunnerus_kalvskinnet",
+    "name": "Gunnerusbiblioteket (Campus Kalvskinnet)",
+    "campus": "Kalvskinnet",
+    "coords": [
+      63.4289,
+      10.3872
+    ],
+    "image": "assets/locations/16.October/gunnerus_kalvskinnet.jpg"
+  },
+  {
+    "id": "hovedbygningen_front",
+    "name": "Hovedbygningen (Hovedinngangen)",
+    "campus": "Gløshaugen",
+    "coords": [
+      63.41945,
+      10.40212
+    ],
+    "image": "assets/locations/16.October/hovedbygningen_front.jpg"
+  },
+  {
+    "id": "realfagbygget_front",
+    "name": "Realfagbygget",
+    "campus": "Gløshaugen",
+    "coords": [
+      63.41584,
+      10.40625
+    ],
+    "image": "assets/locations/16.October/realfagbygget_front.jpg"
+  },
+  {
+    "id": "sentralbygg_stripa",
+    "name": "Sentralbygg 1 & Stripa",
+    "campus": "Gløshaugen",
+    "coords": [
+      63.41829,
+      10.40277
+    ],
+    "image": "assets/locations/16.October/sentralbygg_stripa.jpg"
+  },
+  {
+    "id": "st_olavs_oya",
+    "name": "Kunnskapssenteret (Campus Øya)",
+    "campus": "Øya",
+    "coords": [
+      63.4215,
+      10.3876
+    ],
+    "image": "assets/locations/16.October/st_olavs_oya.jpg"
+  }
+]

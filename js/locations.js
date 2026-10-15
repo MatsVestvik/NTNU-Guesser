@@ -4,7 +4,6 @@
 const NTNU_LOCATIONS = [
   {
     "id": "hovedbygningen_front",
-    "title": "File:Hovedbygningen ved NTNU.jpg",
     "name": "Hovedbygningen (Hovedinngangen)",
     "campus": "Gløshaugen",
     "coords": [
@@ -15,7 +14,6 @@ const NTNU_LOCATIONS = [
   },
   {
     "id": "realfagbygget_front",
-    "title": "File:Realfagbygget (NTNU) 2006.jpg",
     "name": "Realfagbygget",
     "campus": "Gløshaugen",
     "coords": [
@@ -26,7 +24,6 @@ const NTNU_LOCATIONS = [
   },
   {
     "id": "sentralbygg_stripa",
-    "title": "File:Sentralbygg 1 høyblokk Gløshaugen Trondheim 2022-08-18 01.jpg",
     "name": "Sentralbygg 1 & Stripa",
     "campus": "Gløshaugen",
     "coords": [
@@ -37,7 +34,6 @@ const NTNU_LOCATIONS = [
   },
   {
     "id": "studentersamfundet",
-    "title": "File:Studentersamfundet Trondheim 2022-08-18 01.jpg",
     "name": "Studentersamfundet i Trondhjem",
     "campus": "Samfundet",
     "coords": [
@@ -48,7 +44,6 @@ const NTNU_LOCATIONS = [
   },
   {
     "id": "dragvoll_campus",
-    "title": "File:NTNU - Campus Dragvoll.jpg",
     "name": "Campus Dragvoll",
     "campus": "Dragvoll",
     "coords": [

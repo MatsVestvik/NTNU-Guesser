@@ -1,7 +1,5 @@
-/**
- * NTNU Guesser - Main Game Controller
- * Simplified Flow: Enter Name (Start button disabled until valid) -> 5 Daily Locations -> Normal Distribution Curve & Leaderboard Placement.
- */
+const urlParams = new URLSearchParams(window.location.search);
+const ACTIVE_LOCATIONS_FILE = 'assets/15.October.json';
 
 // ==========================================
 // Deterministic Daily Seed & PRNG Utilities
@@ -15,7 +13,7 @@ function getDailySeed(dateStr) {
 }
 
 function mulberry32(a) {
-  return function() {
+  return function () {
     let t = a += 0x6D2B79F5;
     t = Math.imul(t ^ t >>> 15, t | 1);
     t ^= t + Math.imul(t ^ t >>> 7, t | 61);
@@ -23,10 +21,10 @@ function mulberry32(a) {
   };
 }
 
-function getDailyLocations(dateStr, count = 5) {
+function getDailyLocations(dateStr, count = 5, customPool = null) {
   const seed = getDailySeed(dateStr);
   const rng = mulberry32(seed);
-  const pool = [...NTNU_LOCATIONS];
+  const pool = customPool && customPool.length > 0 ? [...customPool] : [...NTNU_LOCATIONS];
 
   // Deterministic Fisher-Yates shuffle
   for (let i = pool.length - 1; i > 0; i--) {
@@ -39,12 +37,12 @@ function getDailyLocations(dateStr, count = 5) {
 // Gaussian CDF approximation (Abramowitz & Stegun formula)
 function normalCDF(score, mean = 16500, std = 4000) {
   const z = (score - mean) / (std * Math.SQRT2);
-  const a1 =  0.254829592;
+  const a1 = 0.254829592;
   const a2 = -0.284496736;
-  const a3 =  1.421413741;
+  const a3 = 1.421413741;
   const a4 = -1.453152027;
-  const a5 =  1.061405429;
-  const p  =  0.3275911;
+  const a5 = 1.061405429;
+  const p = 0.3275911;
 
   const sign = z >= 0 ? 1 : -1;
   const absZ = Math.abs(z);
@@ -359,6 +357,26 @@ class NTNUGuesserGame {
     }
 
     this.startMidnightCountdown();
+
+    // Hent lokasjonsdata fra aktiv JSON-fil
+    await this.loadLocationsData();
+  }
+
+  async loadLocationsData() {
+    try {
+      const resp = await fetch(ACTIVE_LOCATIONS_FILE);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data) && data.length > 0) {
+          this.loadedLocations = data;
+          console.log(`[NTNU Guesser] Lastet ${data.length} lokasjoner fra: ${ACTIVE_LOCATIONS_FILE}`);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn(`[NTNU Guesser] Kunne ikke hente ${ACTIVE_LOCATIONS_FILE}, bruker fallback fra locations.js`, e);
+    }
+    this.loadedLocations = (typeof NTNU_LOCATIONS !== 'undefined') ? [...NTNU_LOCATIONS] : [];
   }
 
   updatePlayerHudName() {
@@ -532,7 +550,7 @@ class NTNUGuesserGame {
       this.elements.btnNextRound.addEventListener('click', () => {
         try {
           soundManager.playClick();
-        } catch (e) {}
+        } catch (e) { }
 
         this.elements.roundResultModal.classList.add('hidden');
         this.elements.mapWidget.classList.remove('result-expanded');
@@ -684,12 +702,20 @@ class NTNUGuesserGame {
     this.roundsData = [];
     this.gameActive = true;
 
+    const availableLocations = (this.loadedLocations && this.loadedLocations.length > 0)
+      ? this.loadedLocations
+      : (typeof NTNU_LOCATIONS !== 'undefined' ? NTNU_LOCATIONS : []);
+
     if (this.gameMode === 'daily') {
-      // Deterministic 5 locations for today's date
-      this.selectedLocations = getDailyLocations(this.todayDate, this.totalRounds);
+      // Hvis JSON-filen har nøyaktig totalRounds (f.eks. 5), bruk stedene i filens rekkefølge
+      if (availableLocations.length === this.totalRounds) {
+        this.selectedLocations = [...availableLocations];
+      } else {
+        this.selectedLocations = getDailyLocations(this.todayDate, this.totalRounds, availableLocations);
+      }
     } else {
       // Practice mode: random 5 locations
-      const pool = [...NTNU_LOCATIONS];
+      const pool = [...availableLocations];
       for (let i = pool.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [pool[i], pool[j]] = [pool[j], pool[i]];
@@ -697,6 +723,7 @@ class NTNUGuesserGame {
       this.selectedLocations = pool.slice(0, this.totalRounds);
     }
 
+    this.totalRounds = this.selectedLocations.length;
     this.updateScoreUI();
     this.loadRound(0);
   }
@@ -780,8 +807,8 @@ class NTNUGuesserGame {
     const deltaLambda = (lon2 - lon1) * Math.PI / 180;
 
     const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
-              Math.cos(phi1) * Math.cos(phi2) *
-              Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+      Math.cos(phi1) * Math.cos(phi2) *
+      Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     return R * c; // Distance in meters
@@ -1045,7 +1072,7 @@ class NTNUGuesserGame {
     let roundsSummary = "";
     this.roundsData.forEach(r => {
       const dist = r.distance !== null
-        ? (r.distance < 1000 ? `${Math.round(r.distance)}m` : `${(r.distance/1000).toFixed(1)}km`)
+        ? (r.distance < 1000 ? `${Math.round(r.distance)}m` : `${(r.distance / 1000).toFixed(1)}km`)
         : '0m';
       roundsSummary += `\n• R${r.round}: ${r.score} poeng (${dist})`;
     });
@@ -1123,10 +1150,10 @@ class NTNUGuesserGame {
 
   toggleFullscreen() {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+      document.documentElement.requestFullscreen().catch(() => { });
     } else {
       if (document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
+        document.exitFullscreen().catch(() => { });
       }
     }
   }
