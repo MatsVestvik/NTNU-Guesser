@@ -4,8 +4,8 @@
     "name": "Kjelhuset (KJL22)",
     "campus": "Gløshaugen",
     "coords": [
-      63.4189,
-      10.4048
+      63.4187558354404,
+      10.404039045152993
     ],
     "image": "assets/locations/15.October/KJL22.png"
   },
@@ -14,8 +14,8 @@
     "name": "Hovedbygningen (Østfløyen)",
     "campus": "Gløshaugen",
     "coords": [
-      63.4191,
-      10.4035
+      63.419251323116406,
+      10.403257535998826
     ],
     "image": "assets/locations/15.October/hovedbygningen_ost.jpg"
   },
@@ -24,8 +24,8 @@
     "name": "Kjelhuset & Varmeteknisk",
     "campus": "Gløshaugen",
     "coords": [
-      63.4189,
-      10.4048
+      63.41821119603789,
+      10.404386176929968
     ],
     "image": "assets/locations/15.October/kjelhuset.jpg"
   },
@@ -34,8 +34,8 @@
     "name": "Marinteknisk Senter (Tyholt)",
     "campus": "Tyholt",
     "coords": [
-      63.41975,
-      10.4278
+      63.42241649660078,
+      10.435225697093436
     ],
     "image": "assets/locations/15.October/marinteknisk_tyholt.jpg"
   },
@@ -44,8 +44,8 @@
     "name": "Realfagbygget (Biblioteket)",
     "campus": "Gløshaugen",
     "coords": [
-      63.41584,
-      10.40625
+      63.415852123376524,
+      10.406446829190239
     ],
     "image": "assets/locations/15.October/realfagbygget_interior.jpg"
   }
