@@ -292,7 +292,6 @@ class NTNUGuesserGame {
       roundResultModal: document.getElementById('round-result-modal'),
       resultDistance: document.getElementById('result-distance'),
       resultPoints: document.getElementById('result-points'),
-      resultRating: document.getElementById('result-rating'),
       resultLocationName: document.getElementById('result-location-name'),
       resultCampusName: document.getElementById('result-campus-name'),
       btnNextRound: document.getElementById('btn-next-round'),
@@ -300,8 +299,6 @@ class NTNUGuesserGame {
       // Game Over: Bell Curve & Leaderboard
       gameOverModal: document.getElementById('game-over-modal'),
       finalScore: document.getElementById('final-score'),
-      finalRankTitle: document.getElementById('final-rank-title'),
-      finalRankDesc: document.getElementById('final-rank-desc'),
       percentileValue: document.getElementById('percentile-value'),
       percentileSubtext: document.getElementById('percentile-subtext'),
       rankValue: document.getElementById('rank-value'),
@@ -832,28 +829,6 @@ class NTNUGuesserGame {
     // Animate score counter
     this.animateScoreCounter(data.score, this.elements.resultPoints);
 
-    // Rating badge text
-    let ratingText = "";
-    let ratingClass = "high";
-    if (data.distance <= 20) {
-      ratingText = "Bullseye! Ekte sivilingeniør-presisjon";
-      ratingClass = "perfect";
-    } else if (data.distance <= 75) {
-      ratingText = "Meget bra treff!";
-      ratingClass = "high";
-    } else if (data.distance <= 250) {
-      ratingText = "Ganske nærme";
-      ratingClass = "medium";
-    } else if (data.distance <= 700) {
-      ratingText = "Riktig campusområde";
-      ratingClass = "low";
-    } else {
-      ratingText = "Langt unna målet";
-      ratingClass = "fail";
-    }
-    this.elements.resultRating.textContent = ratingText;
-    this.elements.resultRating.className = `result-badge ${ratingClass}`;
-
     soundManager.playRoundFinish(data.score);
 
     // Location Info
@@ -900,29 +875,6 @@ class NTNUGuesserGame {
     soundManager.playVictory();
 
     this.elements.finalScore.textContent = `${this.totalScore.toLocaleString('no-NO')} / 25 000`;
-
-    // Calculate degree rank
-    let rankTitle = "";
-    let desc = "";
-    if (this.totalScore >= 24000) {
-      rankTitle = "Sivilingeniør i NTNU-geografi";
-      desc = "Eksepsjonell innsats! Du kjenner hver eneste brostein og auditorium på campus bedre enn rektor!";
-    } else if (this.totalScore >= 20000) {
-      rankTitle = "Mastergrad i campus-geografi";
-      desc = "Imponerende lokalkunnskap! Du navigerer Trondheim på autopilot, selv etter en lang kveld på Bodegaen.";
-    } else if (this.totalScore >= 15000) {
-      rankTitle = "Bachelorgrad i campus-orientering";
-      desc = "Godt levert! Du finner veien til de fleste forelesninger, men har kanskje unngått krikene på Tyholt.";
-    } else if (this.totalScore >= 10000) {
-      rankTitle = "Førsteklassing på jakt etter R1";
-      desc = "Helt greit, men du har nok virret en del rundt i Sentralbygg og lurt på hvor heisen ender.";
-    } else {
-      rankTitle = "Tok linje 3 til feil ende av byen";
-      desc = "Du endte visst opp på feil campus... Anbefaler en guidet tur langs Høgskoleringen og et vaffelhjerte på Stripa!";
-    }
-
-    this.elements.finalRankTitle.textContent = rankTitle;
-    this.elements.finalRankDesc.textContent = desc;
 
     // Calculate total distance
     const totalDist = this.roundsData.reduce((acc, r) => acc + (r.distance || 0), 0);
