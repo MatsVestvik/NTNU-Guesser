@@ -399,7 +399,7 @@ html, body {
   bottom: 24px;
   right: 24px;
   z-index: 50;
-  width: 360px;
+  width: 380px;
   height: 280px;
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
@@ -410,51 +410,40 @@ html, body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
-              transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: bottom right;
 }
 
-/* Expand on Hover unless pinned or expanded */
-.map-widget-container:not(.pinned-large):not(.result-expanded):hover {
-  width: 480px;
-  height: 380px;
-}
-
-/* Pinned Large state */
-.map-widget-container.pinned-large {
-  width: 680px;
-  height: 520px;
+/* State 2: Maximized (Large view) */
+.map-widget-container.maximized,
+.map-widget-container.pinned-large,
+.map-widget-container.result-expanded {
+  width: 760px;
+  height: 540px;
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 120px);
   border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7);
+  z-index: 90;
 }
 
-/* Result Expanded State for Map during round reveal */
-.map-widget-container.result-expanded {
-  position: absolute;
-  top: 80px;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
-  width: auto !important;
-  height: auto !important;
-  z-index: 120;
-  border-color: rgba(255, 255, 255, 0.15);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: auto !important;
-}
-
-.map-widget-container.result-expanded .guess-map-canvas {
-  height: calc(100% - 42px) !important;
-  pointer-events: auto !important;
-}
-
+/* When showing results, hide the guess button footer */
 .map-widget-container.result-expanded .map-footer {
   display: none;
+}
+
+/* Toggle button icon states */
+.map-widget-container.maximized .map-icon-maximize,
+.map-widget-container.pinned-large .map-icon-maximize,
+.map-widget-container.result-expanded .map-icon-maximize {
+  display: none !important;
+}
+
+.map-widget-container.maximized .map-icon-minimize,
+.map-widget-container.pinned-large .map-icon-minimize,
+.map-widget-container.result-expanded .map-icon-minimize {
+  display: block !important;
 }
 
 /* Map Header Bar */
@@ -1112,32 +1101,19 @@ html, body {
     right: 12px;
   }
 
+  /* Mobile Map: Strictly Minimized & Maximized */
   .map-widget-container {
     bottom: 12px;
     right: 12px;
-    width: 260px;
-    height: 200px;
+    width: 280px;
+    height: 220px;
   }
 
-  .map-widget-container:not(.pinned-large):hover {
-    width: 320px;
-    height: 240px;
-  }
-
-  .map-widget-container.pinned-large {
-    width: calc(100vw - 24px);
-    height: 380px;
-  }
-
-  .modal-card {
-    padding: 20px;
-  }
-
+  .map-widget-container.maximized,
+  .map-widget-container.pinned-large,
   .map-widget-container.result-expanded {
-    top: 70px;
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
+    width: calc(100vw - 24px);
+    height: calc(100vh - 120px);
   }
 
   #round-result-modal .modal-card {

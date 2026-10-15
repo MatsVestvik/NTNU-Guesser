@@ -517,8 +517,8 @@ class NTNUGuesserGame {
       this.elements.btnExploreRecapMap.addEventListener('click', () => {
         soundManager.playClick();
         this.elements.gameOverModal.classList.add('hidden');
+        this.toggleMapSize(true);
         this.elements.mapWidget.classList.add('result-expanded');
-        this.gameMap.invalidate();
         if (this.elements.btnBackToSummary) {
           this.elements.btnBackToSummary.classList.remove('hidden');
         }
@@ -530,7 +530,7 @@ class NTNUGuesserGame {
       this.elements.btnBackToSummary.addEventListener('click', () => {
         soundManager.playClick();
         this.elements.btnBackToSummary.classList.add('hidden');
-        this.elements.mapWidget.classList.remove('result-expanded');
+        this.toggleMapSize(false);
         this.elements.gameOverModal.classList.remove('hidden');
       });
     }
@@ -550,8 +550,7 @@ class NTNUGuesserGame {
         } catch (e) { }
 
         this.elements.roundResultModal.classList.add('hidden');
-        this.elements.mapWidget.classList.remove('result-expanded');
-        this.elements.mapWidget.classList.remove('pinned-large');
+        this.toggleMapSize(false);
 
         const nextRoundIndex = this.currentRoundIndex + 1;
         if (nextRoundIndex < this.totalRounds) {
@@ -628,20 +627,20 @@ class NTNUGuesserGame {
       });
     }
 
-    // Map size toggle
+    // Map size toggle (strictly 2 states: minimize and maximize)
     if (this.elements.btnToggleMapSize) {
       this.elements.btnToggleMapSize.addEventListener('click', () => {
         soundManager.playClick();
-        this.elements.mapWidget.classList.toggle('pinned-large');
-        this.gameMap.invalidate();
+        this.toggleMapSize();
       });
     }
 
-    // Map layer toggle
-    if (this.elements.btnToggleLayer) {
-      this.elements.btnToggleLayer.addEventListener('click', () => {
-        soundManager.playClick();
-        this.gameMap.toggleLayer();
+    // Keep Leaflet tiles aligned after map container animations
+    if (this.elements.mapWidget) {
+      this.elements.mapWidget.addEventListener('transitionend', (e) => {
+        if (e.target === this.elements.mapWidget) {
+          this.gameMap.invalidate();
+        }
       });
     }
 
@@ -659,9 +658,9 @@ class NTNUGuesserGame {
         e.preventDefault();
         this.submitGuess();
       } else if (e.key === 'Escape') {
-        if (this.elements.mapWidget.classList.contains('pinned-large')) {
-          this.elements.mapWidget.classList.remove('pinned-large');
-          this.gameMap.invalidate();
+        if (this.elements.mapWidget.classList.contains('pinned-large') || 
+            this.elements.mapWidget.classList.contains('maximized')) {
+          this.toggleMapSize(false);
         }
         if (this.elements.leaderboardModal) this.elements.leaderboardModal.classList.add('hidden');
       }
@@ -691,6 +690,35 @@ class NTNUGuesserGame {
       });
       this.elements.campusPillsContainer.appendChild(pill);
     });
+  }
+
+  toggleMapSize(forceState = null) {
+    if (!this.elements.mapWidget) return;
+
+    const isMax = this.elements.mapWidget.classList.contains('maximized') ||
+                  this.elements.mapWidget.classList.contains('pinned-large');
+    const makeMax = forceState !== null ? forceState : !isMax;
+
+    if (makeMax) {
+      this.elements.mapWidget.classList.add('maximized');
+      this.elements.mapWidget.classList.add('pinned-large');
+      if (this.elements.btnToggleMapSize) {
+        this.elements.btnToggleMapSize.title = 'Minimer kart';
+      }
+    } else {
+      this.elements.mapWidget.classList.remove('maximized');
+      this.elements.mapWidget.classList.remove('pinned-large');
+      this.elements.mapWidget.classList.remove('result-expanded');
+      if (this.elements.btnToggleMapSize) {
+        this.elements.btnToggleMapSize.title = 'Maksimer kart';
+      }
+    }
+
+    // Invalidate Leaflet at staggered intervals to prevent grey tiles during animation
+    this.gameMap.invalidate();
+    setTimeout(() => this.gameMap.invalidate(), 80);
+    setTimeout(() => this.gameMap.invalidate(), 180);
+    setTimeout(() => this.gameMap.invalidate(), 300);
   }
 
   startNewGame() {
@@ -734,9 +762,8 @@ class NTNUGuesserGame {
     this.elements.btnGuess.disabled = true;
     this.elements.btnGuess.classList.remove('ready');
 
-    // Unpin & un-expand map
-    this.elements.mapWidget.classList.remove('pinned-large');
-    this.elements.mapWidget.classList.remove('result-expanded');
+    // Reset map to minimized for new round
+    this.toggleMapSize(false);
     this.gameMap.clearRound();
 
     // Load photo
@@ -781,7 +808,8 @@ class NTNUGuesserGame {
     };
     this.roundsData.push(roundResult);
 
-    // Expand map so player sees their guess and the target
+    // Expand map to maximized so player sees their guess and the target
+    this.toggleMapSize(true);
     this.elements.mapWidget.classList.add('result-expanded');
     setTimeout(() => {
       this.gameMap.invalidate();
