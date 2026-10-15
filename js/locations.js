@@ -55,13 +55,9 @@ const NTNU_LOCATIONS = [
 ];
 
 const NTNU_CAMPUS_PRESETS = [
-  { name: "Gløshaugen", coords: [63.4184, 10.4032], zoom: 16 },
-  { name: "Samfundet", coords: [63.4225, 10.3953], zoom: 17 },
-  { name: "Dragvoll", coords: [63.4087, 10.4704], zoom: 16 },
-  { name: "Tyholt", coords: [63.4198, 10.4278], zoom: 16 },
-  { name: "Øya", coords: [63.4215, 10.3876], zoom: 16 },
-  { name: "Kalvskinnet", coords: [63.4289, 10.3872], zoom: 16 },
-  { name: "Moholt", coords: [63.4124, 10.4343], zoom: 16 }
+  { name: "Gløshaugen", coords: [63.417529697233995, 10.403950652027472], zoom: 16 },
+  { name: "Dragvoll", coords: [63.408216307787384, 10.469540230705926], zoom: 16 },
+  { name: "Tyholt", coords: [63.42303796487462, 10.4331276389853], zoom: 16 },
 ];
 
 if (typeof module !== 'undefined' && module.exports) {
